@@ -25,9 +25,10 @@ function OpenVehicleMenu()
         ESX.UI.Menu.Open(
             'default', GetCurrentResourceName(), 'vehicle_menu',
             {
-                title = _U('vehicle_menu'),
-                align = 'top-left',
-                elements = elements
+                title       = _U('vehicle_menu'),
+                align       = 'top-left',
+                css         = Config.JobName,
+                elements    = elements
             },
             function(data, menu)
                 local model = data.current.value

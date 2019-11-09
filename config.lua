@@ -1,30 +1,29 @@
-Config                          = {}
-Config.Locale                   = 'nl'
-Config.DrawDistance             = 100
-Config.CanSpawnCars             = true
-Config.CanBuyWeapons            = true
-Config.CanSellWeapons           = true
-Config.CanStoreOwnCars          = true
-Config.CanChangeClothes         = true
-Config.SpawnDistanceSpawnPoint  = 5.0
+Config                                  = {}
+Config.Locale                           = 'nl'
+Config.DrawDistance                     = 100
+Config.CanSpawnCars                     = true
+Config.CanBuyWeapons                    = true
+Config.RequiredGradesForWeapons         = { 'boss' }
+Config.RequiredGradesForWeaponDeposit   = { 'boss', 'sovietnik', 'obshchak', 'restap' }
+Config.GradesForDepoAndWithrawWeapons   = { 'boss', 'sovietnik', 'obshchak', 'restap' }
+Config.CanSellWeapons                   = true
+Config.CanStoreOwnCars                  = true
+Config.CanChangeClothes                 = true
+Config.SpawnDistanceSpawnPoint          = 5.0
 
-Config.JobName                  = 'bratva'
+Config.JobName                          = 'bratva'
+Config.JobLabel                         = 'Bratva'
 
-Config.Weapons = {                                          -- Weapons the Bratva can buy and the price for those weapons
-    { name = 'WEAPON_NIGHTSTICK',       price =   9000 },   -- > Nightstick         for €   9.000
-    { name = 'WEAPON_PISTOL',           price = 150000 },   -- > Pistol             for € 150.000
-    { name = 'WEAPON_COMBATPISTOL',     price = 175000 },   -- > Combat Pistol      for € 175.000
-    { name = 'WEAPON_HEAVYPISTOL',      price = 225000 },   -- > Heavy Pistol       for € 225.000
-    { name = 'WEAPON_MACHINEPISTOL',    price = 250000 },   -- > Machine Pistol     for € 250.000
-    { name = 'WEAPON_MICROSMG',         price = 275000 },   -- > Micro SMG          for € 275.000
-    { name = 'WEAPON_SAWNOFFSHOTGUN',   price = 300000 },   -- > Sawed-Off Shotgun  for € 300.000
-    { name = 'WEAPON_COMPACTRIFLE',     price = 400000 }    -- > Compact Rifle      for € 400.000
+Config.Weapons = {                                          -- Weapons they can buy and the price for those weapons
+    { name = 'WEAPON_SNSPISTOL',        price = 125000 },   -- > SNS Pistol         for € 125.000
+    { name = 'WEAPON_PISTOL50',         price = 175000 },   -- > Pistol .50         for € 175.000
+    { name = 'WEAPON_DBSHOTGUN',        price = 275000 },   -- > Combat Pistol      for € 275.000
+    { name = 'WEAPON_COMPACTRIFLE',     price = 350000 },   -- > Heavy Pistol       for € 350.000
+    { name = 'WEAPON_ASSAULTRIFLE',     price = 400000 },   -- > Machine Pistol     for € 400.000
 }
 
-Config.SpawnVehicles = {                                            -- Cars the bratva can spawn
-    { name = 'Audi RS7',                    model = 'rs7' },        -- > Audi RS7
-    { name = 'Mercedes CLA45',              model = 'cla45sb' },    -- > Mercedes CLA45
-    { name = 'Range Rover Vogue Startech',  model = 'rrst' },       -- > 2019 Range Rover Velar
+Config.SpawnVehicles = {                    -- Cars they can spawn
+    { name = 'Audi RS7', model = 'rs7' },   -- > Audi RS7
 }
 
 Config.VehicleProps = {         -- Tune car when spawned

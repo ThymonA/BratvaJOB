@@ -13,7 +13,7 @@ local Keys = {
 local PlayerData                = {}
 local CurrentAction             = nil
 local LastAction                = nil
-local HasAlreadyEnteredMarker   = false
+local ActionData                = nil
 local Action                    = {
     SpawnVehicle    = 'SpawnVehicle',
     OpenGarage      = 'OpenGarage',
@@ -42,26 +42,26 @@ end)
 -- Draw markers
 Citizen.CreateThread(function()
     while true do
-        if (IsBratva()) then
-           local playerPed = GetPlayerPed(-1)
-           local coords = GetEntityCoords(playerPed)
+        if (PlayerContainsJob()) then
+            local playerPed = GetPlayerPed(-1)
+            local coords = GetEntityCoords(playerPed)
           
             -- Markers
-           local marker = Config.Marker
-           local defaultMarker = marker.Default
-           local garageMarker = marker.Garage
-           local clothingMarker = marker.Clothing
-           local safeMarker = marker.Safe
-           local boosMarker = marker.Boss
+            local marker = Config.Marker
+            local defaultMarker = marker.Default
+            local garageMarker = marker.Garage
+            local clothingMarker = marker.Clothing
+            local safeMarker = marker.Safe
+            local bossMarker = marker.Boss
 
-           -- Locations
-           local vehicleCircle = Config.Locations.VehicleCircleLocation
-           local garageCircle = Config.Locations.GarageCircleLocation
-           local garageParkingCircle = Config.Locations.GarageParkingCircleLocation
-           local clothingCircle = Config.Locations.ClothingCircleLocation
-           local safeCircle = Config.Locations.SafeCircleLocation
-           local weaponSafeCircle = Config.Locations.WeaponSafeCircleLocation
-           local boosSafeCircle = Config.Locations.BossCircleLocation
+            -- Locations
+            local vehicleCircle = Config.Locations.VehicleCircleLocation
+            local garageCircle = Config.Locations.GarageCircleLocation
+            local garageParkingCircle = Config.Locations.GarageParkingCircleLocation
+            local clothingCircle = Config.Locations.ClothingCircleLocation
+            local safeCircle = Config.Locations.SafeCircleLocation
+            local weaponSafeCircle = Config.Locations.WeaponSafeCircleLocation
+            local bossSafeCircle = Config.Locations.BossCircleLocation
 
             if (Config.CanSpawnCars) then
                 if (GetDistanceBetweenCoords(coords, vehicleCircle.x, vehicleCircle.y, vehicleCircle.z, true) < Config.DrawDistance) then
@@ -89,8 +89,8 @@ Citizen.CreateThread(function()
                 DrawMarker(marker.Type, weaponSafeCircle.x, weaponSafeCircle.y, weaponSafeCircle.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, safeMarker.x, safeMarker.y, safeMarker.z, safeMarker.r, safeMarker.g, safeMarker.b, 100, false, true, 2, false, false, false, false)
             end
             
-            if (GetDistanceBetweenCoords(coords, boosSafeCircle.x, boosSafeCircle.y, boosSafeCircle.z, true) < Config.DrawDistance) then
-                DrawMarker(marker.Type, boosSafeCircle.x, boosSafeCircle.y, boosSafeCircle.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, boosMarker.x, boosMarker.y, boosMarker.z, boosMarker.r, boosMarker.g, boosMarker.b, 100, false, true, 2, false, false, false, false)
+            if (GetDistanceBetweenCoords(coords, bossSafeCircle.x, bossSafeCircle.y, bossSafeCircle.z, true) < Config.DrawDistance) then
+                DrawMarker(marker.Type, bossSafeCircle.x, bossSafeCircle.y, bossSafeCircle.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, bossMarker.x, bossMarker.y, bossMarker.z, bossMarker.r, bossMarker.g, bossMarker.b, 100, false, true, 2, false, false, false, false)
             end
         end
 
@@ -105,26 +105,26 @@ Citizen.CreateThread(function()
 
         local isInMarker = false
 
-        if (IsBratva()) then
+        if (PlayerContainsJob()) then
             local playerPed = GetPlayerPed(-1)
             local coords = GetEntityCoords(playerPed)
 
             -- Markers
-           local marker = Config.Marker
-           local defaultMarker = marker.Default
-           local garageMarker = marker.Garage
-           local clothingMarker = marker.Clothing
-           local safeMarker = marker.Safe
-           local boosMarker = marker.Boss
+            local marker = Config.Marker
+            local defaultMarker = marker.Default
+            local garageMarker = marker.Garage
+            local clothingMarker = marker.Clothing
+            local safeMarker = marker.Safe
+            local bossMarker = marker.Boss
 
-           -- Locations
-           local vehicleCircle = Config.Locations.VehicleCircleLocation
-           local garageCircle = Config.Locations.GarageCircleLocation
-           local garageParkingCircle = Config.Locations.GarageParkingCircleLocation
-           local clothingCircle = Config.Locations.ClothingCircleLocation
-           local safeCircle = Config.Locations.SafeCircleLocation
-           local weaponSafeCircle = Config.Locations.WeaponSafeCircleLocation
-           local boosSafeCircle = Config.Locations.BossCircleLocation
+            -- Locations
+            local vehicleCircle = Config.Locations.VehicleCircleLocation
+            local garageCircle = Config.Locations.GarageCircleLocation
+            local garageParkingCircle = Config.Locations.GarageParkingCircleLocation
+            local clothingCircle = Config.Locations.ClothingCircleLocation
+            local safeCircle = Config.Locations.SafeCircleLocation
+            local weaponSafeCircle = Config.Locations.WeaponSafeCircleLocation
+            local bossSafeCircle = Config.Locations.BossCircleLocation
             
             if (Config.CanSpawnCars) then
                 if (GetDistanceBetweenCoords(coords, vehicleCircle.x, vehicleCircle.y, vehicleCircle.z, true) < defaultMarker.x) then
@@ -158,22 +158,18 @@ Citizen.CreateThread(function()
                 CurrentAction = Action.OpenWeaponSafe
             end
 
-            if (GetDistanceBetweenCoords(coords, boosSafeCircle.x, boosSafeCircle.y, boosSafeCircle.z, true) < boosMarker.x) then
+            if (GetDistanceBetweenCoords(coords, bossSafeCircle.x, bossSafeCircle.y, bossSafeCircle.z, true) < bossMarker.x) then
                 isInMarker = true
                 CurrentAction = Action.BossActions
             end
 
             if (isInMarker and LastAction == nil) then
-                TriggerEvent('ml_bratvajob:hasEnteredMarker')
+                TriggerEvent('ml_' .. Config.JobName .. 'job:hasEnteredMarker')
             end
 
             if (not isInMarker and LastAction ~= nil) then
-                TriggerEvent('ml_bratvajob:hasExitedMarker')
+                TriggerEvent('ml_' .. Config.JobName .. 'job:hasExitedMarker')
             end
-        end
-
-        if not isInMarker then
-			Citizen.Wait(500)
         end
         
         Citizen.Wait(0)
@@ -195,11 +191,11 @@ Citizen.CreateThread(function()
                 end
 
                 if (IsCurrentAction(Action.OpenGarage)) then
-                    ESX.ShowHelpNotification(_U('open_bratva_garage'))
+                    ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_garage'))
                 end
 
                 if (IsCurrentAction(Action.ParkInGarage)) then
-                    ESX.ShowHelpNotification(_U('parking_bratva_garage'))
+                    ESX.ShowHelpNotification(_U('parking_' .. Config.JobName .. '_garage'))
                 end
 
                 if (Config.CanChangeClothes and IsCurrentAction(Action.ChangeClothes) or
@@ -208,61 +204,67 @@ Citizen.CreateThread(function()
                 end
 
                 if (IsCurrentAction(Action.OpenSafe)) then
-                    ESX.ShowHelpNotification(_U('open_bratva_safe'))
+                    ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_safe'))
                 end
 
                 if (IsCurrentAction(Action.OpenWeaponSafe)) then
-                    ESX.ShowHelpNotification(_U('open_bratva_weapon_safe'))
+                    ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_weapon_safe'))
+                end
+
+                if (IsCurrentAction(Action.OpenWeaponSafe) or
+                    IsLastAction(Action.OpenWeaponSafe)) then
+                    OpenWeaponSafeMenu()
                 end
 
                 if (IsCurrentAction(Action.BossActions)) then
-                    ESX.ShowHelpNotification(_U('open_bratva_boss_menu'))
+                    ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_boss_menu'))
                 end
 
                 CurrentAction = nil
-			end
+            end
 		else
-			Citizen.Wait(500)
+			Citizen.Wait(0)
 		end
 	end
 end)
 
-AddEventHandler('ml_bratvajob:hasEnteredMarker', function()
+AddEventHandler('ml_' .. Config.JobName .. 'job:hasEnteredMarker', function()
     if (LastAction == nil) then
         if (Config.CanSpawnCars and IsCurrentAction(Action.SpawnVehicle)) then
-            ESX.ShowHelpNotification(_U('spawn_bratva_vehicle'))
+            ESX.ShowHelpNotification(_U('spawn_' .. Config.JobName .. '_vehicle'))
         end
 
         if (IsCurrentAction(Action.OpenGarage)) then
-            ESX.ShowHelpNotification(_U('open_bratva_garage'))
+            ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_garage'))
         end
 
         if (IsCurrentAction(Action.ParkInGarage)) then
-            ESX.ShowHelpNotification(_U('parking_bratva_garage'))
+            ESX.ShowHelpNotification(_U('parking_' .. Config.JobName .. '_garage'))
         end
 
         if (IsCurrentAction(Action.ChangeClothes)) then
-            ESX.ShowHelpNotification(_U('open_bratva_clothes'))
+            ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_clothes'))
         end
 
         if (IsCurrentAction(Action.OpenSafe)) then
-            ESX.ShowHelpNotification(_U('open_bratva_safe'))
+            ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_safe'))
         end
 
         if (IsCurrentAction(Action.OpenWeaponSafe)) then
-            ESX.ShowHelpNotification(_U('open_bratva_weapon_safe'))
+            ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_weapon_safe'))
         end
 
         if (IsCurrentAction(Action.BossActions)) then
-            ESX.ShowHelpNotification(_U('open_bratva_boss_menu'))
+            ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_boss_menu'))
         end
     end
 end)
 
-AddEventHandler('ml_bratvajob:hasExitedMarker', function()
+AddEventHandler('ml_' .. Config.JobName .. 'job:hasExitedMarker', function()
 	ESX.UI.Menu.CloseAll()
     CurrentAction = nil
     LastAction = nil
+    ActionData = nil
 end)
 
 function RemoveVehicles()
@@ -277,7 +279,7 @@ function RemoveVehicles()
     end
 end
 
-function IsBratva()
+function PlayerContainsJob()
     return (PlayerData.job ~= nil and string.lower(PlayerData.job.name) == string.lower(Config.JobName)) or
         (PlayerData.job2 ~= nil and string.lower(PlayerData.job2.name) == string.lower(Config.JobName))
 end

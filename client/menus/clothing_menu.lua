@@ -22,9 +22,10 @@ function OpenClothingMenu()
 
   ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'clothing_menu',
     {
-      title = _U('clothing_menu'),
-      align = 'top-left',
-      elements = elements
+      title       = _U('vehicle_menu'),
+      align       = 'top-left',
+      css         = Config.JobName,
+      elements    = elements
     },
     function (data, menu)
       local index = data.current.value
@@ -86,8 +87,6 @@ function LoadPlayerClothes()
 
       if (#grades > 0) then
         access = false
-
-        ESX.ShowNotification(_U('no_outfit'))
         
         for i = 1, #grades, 1 do
           if (grades[i] ~= nil and HasGrade(grades[i])) then

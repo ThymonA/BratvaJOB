@@ -49,7 +49,7 @@ function OpenEmployeeMenu()
         { label = _U('list_employee'), value = 'list_employee' },
         { label = _U('add_employee'), value = 'add_employee' },
         { label = _U('remove_employee'), value = 'remove_employee' },
-        { label = _U('promition_employee'), value = 'promition_employee' },
+        { label = _U('promote_employee'), value = 'promote_employee' },
         { label = _U('demote_employee'), value = 'demote_employee' },
     }
 
@@ -70,8 +70,10 @@ function OpenEmployeeMenu()
                 OpenEmployeeHireMenu()
             elseif (data.current.value == 'remove_employee') then
                 OpenEmployeeFireMenu()
-            elseif (data.current.value == 'promition_employee') then
+            elseif (data.current.value == 'promote_employee') then
                 OpenPromitionMenu()
+            elseif (data.current.value == 'demote_employee') then
+                OpenDemotionMenu()
             end
         end,
         function(data, menu)
@@ -375,23 +377,36 @@ function OpenPromitionMenu()
                 function (data, menu)
                     if (data.value == 'promote') then
                         local employee = data.data
-                        local elements = {
-                            { label = 'Test', value = 0 },
-                            { label = 'Test2', value = 1, disabled = true }
-                        }
+                        local gradeLabel = _U('unkown')
+                        local gradeElements = {}
 
                         for _, grade in pairs(grades) do
                             local employeeGrade = 0
 
                             if (string.lower(employee.job.name) == string.lower(Config.JobName)) then
                                 employeeGrade = employee.job.grade
+                                gradeLabel = grade.label
                             elseif (string.lower(employee.job2.name) == string.lower(Config.JobName)) then
                                 employeeGrade = employee.job2.grade
+                                gradeLabel = grade.label
                             end
 
                             if (grade.grade > employeeGrade) then
-                                table.insert(elements, { label = grade.label, value = grade.grade })
+                                table.insert(gradeElements, { label = grade.label, value = grade.grade })
+                            else
+                                table.insert(gradeElements, { label = grade.label, value = grade.grade, disabled = true })
                             end
+                        end
+
+                        local elements = {
+                            { label = _U('employee_promote_name', data.data.name), value = '', disabled = true },
+                            { label = _U('employee_promote_steam', data.data.sname), value = '', disabled = true },
+                            { label = _U('employee_promote_grade', gradeLabel), value = '', disabled = true },
+                            { label = _U('new_rank'), value = '', disabled = true },
+                        }
+
+                        for _, gradeElement in pairs(gradeElements) do
+                            table.insert(elements, gradeElement)
                         end
 
                         menu.close()
@@ -406,10 +421,172 @@ function OpenPromitionMenu()
                                 css         = Config.JobName,
                                 elements    = elements
                             },
-                            function(data, menu)
+                            function(data2, menu2)
+                                for _, grade in pairs(grades) do
+                                    if (grade.grade == data2.current.value) then
+                                        if (string.lower(employee.job.name) == string.lower(Config.JobName)) then
+                                            ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:setJob', function()
+                                                ESX.ShowNotification(_U('you_have_promote', employee.name, grade.label, Config.JobLabel))
+                                                ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
+                                                        menu2.close()
+                                                        menu.close()
+                                                        OpenPromitionMenu()
+                                                end, employee.identifier, _U('you_promoted', grade.label, Config.JobLabel))
+                                            end, employee.identifier, Config.JobName, grade.grade)
+                                        elseif (string.lower(employee.job2.name) == string.lower(Config.JobName)) then
+                                            ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:setJob2', function()
+                                                ESX.ShowNotification(_U('you_have_promote', employee.name, grade.label, Config.JobLabel))
+                                                ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
+                                                        menu2.close()
+                                                        menu.close()
+                                                        OpenPromitionMenu()
+                                                end, employee.identifier, _U('you_promoted', grade.label, Config.JobLabel))
+                                            end, employee.identifier, Config.JobName, grade.grade)
+                                        end
+                                    end
+                                end
                             end,
-                            function(data, menu)
-                                menu.close()
+                            function(data2, menu2)
+                                menu2.close()
+                            end)
+                    end
+                end,
+                function(data, menu)
+                    menu.close()
+                end)
+        end)
+    end)
+end
+
+function OpenDemotionMenu()
+    ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:loadGrades', function(grades)
+        local elements = {}
+        local lowestGrade = 0
+
+        for _, grade in pairs(grades) do
+            if (lowestGrade > grade.grade) then
+                lowestGrade = grade.grade
+            end
+        end
+
+        ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:getWorkingEmployees', function(employees)
+            for _, employee in pairs(employees) do
+                local employeeLabel = ''
+                local employeeGrade = 0
+                local isPrimaryJob = true
+
+                if (string.lower(employee.job.name) == string.lower(Config.JobName)) then
+                    employeeGrade = employee.job.grade
+                    employeeLabel = employee.job.grade_label
+                    isPrimaryJob = true
+                elseif (string.lower(employee.job2.name) == string.lower(Config.JobName)) then
+                    employeeGrade = employee.job2.grade
+                    employeeLabel = employee.job2.grade_label
+                    isPrimaryJob = false
+                end
+
+                if (employeeGrade ~= lowestGrade) then
+                    table.insert(elements, {
+                        data = employee,
+                        cols = {
+                            employee.sname,
+                            employee.name,
+                            GetHTMLJobLabel(employeeLabel, isPrimaryJob),
+                            '{{' .. _U('demote') .. '|demote}}'
+                        }
+                    })
+                end
+            end
+
+            table.sort(elements, SortPlayers)
+            table.sort(elements, SortEmployees)
+
+            ESX.UI.Menu.Open(
+                'ml_list',
+                GetCurrentResourceName(),
+                'demote_employee',
+                {
+                    title       = _U('demote_employee'),
+                    align       = 'top-left',
+                    css         = Config.JobName,
+                    buttonClass = 'red',
+                    head        = { _U('steam_name'), _U('character_name'), _U('rank_name'), _U('actions') },
+                    rows        = elements
+                },
+                function (data, menu)
+                    if (data.value == 'demote') then
+                        local employee = data.data
+                        local gradeLabel = _U('unkown')
+                        local gradeElements = {}
+
+                        for _, grade in pairs(grades) do
+                            local employeeGrade = 0
+
+                            if (string.lower(employee.job.name) == string.lower(Config.JobName)) then
+                                employeeGrade = employee.job.grade
+                                gradeLabel = grade.label
+                            elseif (string.lower(employee.job2.name) == string.lower(Config.JobName)) then
+                                employeeGrade = employee.job2.grade
+                                gradeLabel = grade.label
+                            end
+
+                            if (grade.grade < employeeGrade) then
+                                table.insert(gradeElements, { label = grade.label, value = grade.grade })
+                            else
+                                table.insert(gradeElements, { label = grade.label, value = grade.grade, disabled = true })
+                            end
+                        end
+
+                        local elements = {
+                            { label = _U('employee_demote_name', data.data.name), value = '', disabled = true },
+                            { label = _U('employee_demote_steam', data.data.sname), value = '', disabled = true },
+                            { label = _U('employee_demote_grade', gradeLabel), value = '', disabled = true },
+                            { label = _U('new_rank'), value = '', disabled = true },
+                        }
+
+                        for _, gradeElement in pairs(gradeElements) do
+                            table.insert(elements, gradeElement)
+                        end
+
+                        menu.close()
+
+                        ESX.UI.Menu.Open(
+                            'ml',
+                            GetCurrentResourceName(),
+                            'demote_employee_rank',
+                            {
+                                title       = _U('demote_employee_rank'),
+                                align       = 'top-left',
+                                css         = Config.JobName,
+                                elements    = elements
+                            },
+                            function(data2, menu2)
+                                for _, grade in pairs(grades) do
+                                    if (grade.grade == data2.current.value) then
+                                        if (string.lower(employee.job.name) == string.lower(Config.JobName)) then
+                                            ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:setJob', function()
+                                                ESX.ShowNotification(_U('you_have_demote', employee.name, grade.label, Config.JobLabel))
+                                                ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
+                                                        menu2.close()
+                                                        menu.close()
+                                                        OpenDemotionMenu()
+                                                end, employee.identifier, _U('you_demoted', grade.label, Config.JobLabel))
+                                            end, employee.identifier, Config.JobName, grade.grade)
+                                        elseif (string.lower(employee.job2.name) == string.lower(Config.JobName)) then
+                                            ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:setJob2', function()
+                                                ESX.ShowNotification(_U('you_have_demote', employee.name, grade.label, Config.JobLabel))
+                                                ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
+                                                        menu2.close()
+                                                        menu.close()
+                                                        OpenDemotionMenu()
+                                                end, employee.identifier, _U('you_demoted', grade.label, Config.JobLabel))
+                                            end, employee.identifier, Config.JobName, grade.grade)
+                                        end
+                                    end
+                                end
+                            end,
+                            function(data2, menu2)
+                                menu2.close()
                             end)
                     end
                 end,

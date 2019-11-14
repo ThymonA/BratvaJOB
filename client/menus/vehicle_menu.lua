@@ -23,7 +23,7 @@ function OpenVehicleMenu()
         end
 
         ESX.UI.Menu.Open(
-            'default', GetCurrentResourceName(), 'vehicle_menu',
+            'ml', GetCurrentResourceName(), 'vehicle_menu',
             {
                 title       = _U('vehicle_menu'),
                 align       = 'top-left',
@@ -74,7 +74,9 @@ function OpenVehicleMenu()
 
                     ESX.Game.SetVehicleProperties(veh, Config.VehicleProps)
                 end)
-            end
-        )
+            end,
+            function(data, menu)
+                menu.close()
+            end)
     end
 end

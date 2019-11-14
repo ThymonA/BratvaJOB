@@ -20,9 +20,9 @@ function OpenClothingMenu()
 
   local elements = LoadPlayerClothes()
 
-  ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'clothing_menu',
+  ESX.UI.Menu.Open('ml', GetCurrentResourceName(), 'clothing_menu',
     {
-      title       = _U('vehicle_menu'),
+      title       = _U('clothing_menu'),
       align       = 'top-left',
       css         = Config.JobName,
       elements    = elements
@@ -71,6 +71,9 @@ function OpenClothingMenu()
 				
 				TriggerEvent('mlx:restoreLoadout')
       end
+    end,
+    function(data, menu)
+        menu.close()
     end)
 end
 

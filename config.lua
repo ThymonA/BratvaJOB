@@ -3,23 +3,26 @@ Config.Locale                           = 'nl'
 Config.DrawDistance                     = 100
 Config.CanSpawnCars                     = true
 Config.CanBuyWeapons                    = true
-Config.RequiredGradesForWeapons         = { 'boss' }
+Config.RequiredGradesForWeapons         = { 'boss', 'sovietnik' }
 Config.RequiredGradesForWeaponDeposit   = { 'boss', 'sovietnik', 'obshchak', 'restap' }
 Config.GradesForDepoAndWithrawWeapons   = { 'boss', 'sovietnik', 'obshchak', 'restap' }
+Config.RequiredGradesForBossActions     = { 'boss' }
 Config.CanSellWeapons                   = true
 Config.CanStoreOwnCars                  = true
 Config.CanChangeClothes                 = true
 Config.SpawnDistanceSpawnPoint          = 5.0
+Config.NumberOfBullets                  = 250
+Config.MaxListSize                      = 15
 
 Config.JobName                          = 'bratva'
 Config.JobLabel                         = 'Bratva'
 
 Config.Weapons = {                                          -- Weapons they can buy and the price for those weapons
-    { name = 'WEAPON_SNSPISTOL',        price = 125000 },   -- > SNS Pistol         for € 125.000
+    { name = 'WEAPON_PISTOL',           price = 125000 },   -- > Pistol             for € 125.000
     { name = 'WEAPON_PISTOL50',         price = 175000 },   -- > Pistol .50         for € 175.000
-    { name = 'WEAPON_DBSHOTGUN',        price = 275000 },   -- > Combat Pistol      for € 275.000
-    { name = 'WEAPON_COMPACTRIFLE',     price = 350000 },   -- > Heavy Pistol       for € 350.000
-    { name = 'WEAPON_ASSAULTRIFLE',     price = 400000 },   -- > Machine Pistol     for € 400.000
+    { name = 'WEAPON_DBSHOTGUN',        price = 275000 },   -- > DB Shotgun         for € 275.000
+    { name = 'WEAPON_MINISMG',          price = 350000 },   -- > Mini SMG           for € 350.000
+    { name = 'WEAPON_ASSAULTRIFLE',     price = 400000 },   -- > Assault Riffle     for € 400.000
 }
 
 Config.SpawnVehicles = {                    -- Cars they can spawn

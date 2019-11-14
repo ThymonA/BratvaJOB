@@ -63,3 +63,7 @@ function comma_value(amount)
 
 	return string.gsub(formatted, '#', ',')
   end
+
+  function round(num)
+	return tonumber(string.format("%.0f", num))
+  end

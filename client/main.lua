@@ -14,6 +14,8 @@ local PlayerData                = {}
 local CurrentAction             = nil
 local LastAction                = nil
 local ActionData                = nil
+local Blips                     = {}
+local BlipsUpdated              = false
 local Action                    = {
     SpawnVehicle    = 'SpawnVehicle',
     OpenGarage      = 'OpenGarage',
@@ -89,7 +91,7 @@ Citizen.CreateThread(function()
                 DrawMarker(marker.Type, weaponSafeCircle.x, weaponSafeCircle.y, weaponSafeCircle.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, safeMarker.x, safeMarker.y, safeMarker.z, safeMarker.r, safeMarker.g, safeMarker.b, 100, false, true, 2, false, false, false, false)
             end
             
-            if (GetDistanceBetweenCoords(coords, bossSafeCircle.x, bossSafeCircle.y, bossSafeCircle.z, true) < Config.DrawDistance) then
+            if (HasAccess(Config.RequiredGradesForBossActions) and GetDistanceBetweenCoords(coords, bossSafeCircle.x, bossSafeCircle.y, bossSafeCircle.z, true) < Config.DrawDistance) then
                 DrawMarker(marker.Type, bossSafeCircle.x, bossSafeCircle.y, bossSafeCircle.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, bossMarker.x, bossMarker.y, bossMarker.z, bossMarker.r, bossMarker.g, bossMarker.b, 100, false, true, 2, false, false, false, false)
             end
         end
@@ -158,7 +160,7 @@ Citizen.CreateThread(function()
                 CurrentAction = Action.OpenWeaponSafe
             end
 
-            if (GetDistanceBetweenCoords(coords, bossSafeCircle.x, bossSafeCircle.y, bossSafeCircle.z, true) < bossMarker.x) then
+            if (HasAccess(Config.RequiredGradesForBossActions) and GetDistanceBetweenCoords(coords, bossSafeCircle.x, bossSafeCircle.y, bossSafeCircle.z, true) < bossMarker.x) then
                 isInMarker = true
                 CurrentAction = Action.BossActions
             end
@@ -207,17 +209,14 @@ Citizen.CreateThread(function()
                     ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_safe'))
                 end
 
-                if (IsCurrentAction(Action.OpenWeaponSafe)) then
-                    ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_weapon_safe'))
-                end
-
                 if (IsCurrentAction(Action.OpenWeaponSafe) or
                     IsLastAction(Action.OpenWeaponSafe)) then
                     OpenWeaponSafeMenu()
                 end
 
-                if (IsCurrentAction(Action.BossActions)) then
-                    ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_boss_menu'))
+                if (HasAccess(Config.RequiredGradesForBossActions) and IsCurrentAction(Action.BossActions) or
+                    HasAccess(Config.RequiredGradesForBossActions) and IsLastAction(Action.BossActions)) then
+                    OpenBossMenu()
                 end
 
                 CurrentAction = nil
@@ -226,6 +225,17 @@ Citizen.CreateThread(function()
 			Citizen.Wait(0)
 		end
 	end
+end)
+
+-- Update Blips when first loaded
+Citizen.CreateThread(function()
+    Citizen.Wait(0)
+
+    while not BlipsUpdated do
+        if (ESX ~= nil and PlayerData ~= nil) then
+            TriggerEvent('ml_' .. Config.JobName .. 'job:updateBlip')
+        end
+    end
 end)
 
 AddEventHandler('ml_' .. Config.JobName .. 'job:hasEnteredMarker', function()
@@ -254,7 +264,7 @@ AddEventHandler('ml_' .. Config.JobName .. 'job:hasEnteredMarker', function()
             ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_weapon_safe'))
         end
 
-        if (IsCurrentAction(Action.BossActions)) then
+        if (HasAccess(Config.RequiredGradesForBossActions) and IsCurrentAction(Action.BossActions)) then
             ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_boss_menu'))
         end
     end
@@ -266,6 +276,51 @@ AddEventHandler('ml_' .. Config.JobName .. 'job:hasExitedMarker', function()
     LastAction = nil
     ActionData = nil
 end)
+
+RegisterNetEvent('ml_' .. Config.JobName .. 'job:updateBlip')
+AddEventHandler('ml_' .. Config.JobName .. 'job:updateBlip', function()
+    for _, playerBlip in pairs(Blips) do
+        RemoveBlip(playerBlip)
+    end
+
+    Blips = {}
+
+    if (PlayerContainsJob()) then
+        ESX.TriggerServerCallback('mlx_society:getOnlinePlayers', function(players)
+            for _, player in pairs(players) do
+                if (player.job ~= nil and string.lower(player.job.name) == string.lower(Config.JobName)) or
+                    (player.job2 ~= nil and string.lower(player.job2.name) == string.lower(Config.JobName)) then
+                    local playerId = GetPlayerFromServerId(player.source)
+
+                    if (NetworkIsPlayerActive(playerId)) then
+                        CreateJobBlip(playerId)
+                    end
+                end
+            end
+        end)
+    end
+
+    BlipsUpdated = true
+end)
+
+function CreateJobBlip(playerId)
+    local currentPlayer = PlayerPedId(-1)
+    local playerPed = GetPlayerPed(playerId)
+    local playerBlip = GetBlipFromEntity(playerPed)
+
+    if (DoesBlipExist(playerBlip) == false and currentPlayer ~= playerPed) then
+        playerBlip = AddBlipForEntity(playerPed)
+
+        SetBlipSprite(playerBlip, 1)
+        ShowHeadingIndicatorOnBlip(playerBlip, true)
+        SetBlipRotation(playerBlip, math.ceil(GetEntityHeading(ped)))
+		SetBlipNameToPlayerName(playerBlip, playerId)
+		SetBlipScale(playerBlip, 0.85)
+        SetBlipAsShortRange(playerBlip, true)
+
+        table.insert(Blips, playerBlip)
+    end
+end
 
 function RemoveVehicles()
     local spots = Config.Locations.GarageSpotLocations
@@ -290,6 +345,36 @@ end
 
 function IsLastAction(action)
     return LastAction ~= nil and string.lower(LastAction) == string.lower(action)
+end
+
+function HasAccess(array, default)
+    local access = default
+
+    if (array == nil) then
+        return access
+    end
+
+    if(#array > 0) then
+        access = false
+
+        for i = 1, #array, 1 do
+            if (array[i] ~= nil and HasGrade(array[i])) then
+                access = true
+            end
+        end
+    end
+
+    return access
+end
+
+function HasGrade(grade)
+    local playerGrade = nil
+
+    if (PlayerData ~= nil and PlayerData.job ~= nil and PlayerData.job.grade_name ~= nil) then
+        playerGrade = string.lower(PlayerData.job.grade_name)
+    end
+
+    return string.lower(grade) == playerGrade
 end
 
 RegisterNetEvent('mlx:setJob')

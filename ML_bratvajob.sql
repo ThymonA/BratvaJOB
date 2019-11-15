@@ -5,7 +5,11 @@ INSERT INTO `datastore` (`name`, `label`, `shared`) VALUES
 ('society_bratva', 'Bratva', 1);
 
 INSERT INTO `addon_account` (`name`, `label`, `shared`) VALUES
-('society_bratva', 'Bratva', 1);
+('society_bratva', 'Bratva', 1),
+('society_bratva_black_money', 'Bratva Zwart Geld', 1);
+
+INSERT INTO `addon_account_data` (`account_name`, `money`, `owner`) VALUES
+('society_bratva_black_money', 0, NULL);
 
 INSERT INTO `addon_inventory` (`name`, `label`, `shared`) VALUES
 ('society_bratva', 'Bratva', 1);

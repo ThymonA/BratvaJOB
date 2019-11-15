@@ -68,6 +68,10 @@ Config.Marker = {                           -- Markers
         x = 1.5,    y = 1.5,    z = 0.5,    -- > Size
         r = 255,    g = 255,    b = 0       -- > Color
     },
+    Warehouse = {                           -- Boss Action Menu Marker
+        x = 5.0,    y = 5.0,    z = 0.5,    -- > Size
+        r = 0,      g = 255,    b = 0       -- > Color
+    },
 }
 
 Config.Locations = {                                                                    -- All locations
@@ -80,6 +84,7 @@ Config.Locations = {                                                            
     SafeCircleLocation = { x = 563.5, y = -3127.04, z = 17.77 },                        -- Safe location
     WeaponSafeCircleLocation = { x = 575.41, y = -3121.4, z = 17.77 },                  -- Weapon safe location
     BossCircleLocation = { x = 569.88, y = -3126.8, z = 17.78 },                        -- Boss location
+    WarehouseLocation = { x = 470.75, y = -3133.39, z = 5.08 },                         -- Warehouse location
     GarageSpotLocations = {                                                             -- Garage spots
         { x = 509.00, y = -3143.00, z = 5.1, h = 89.5 },                                -- > Spot 01
         { x = 509.00, y = -3146.00, z = 5.1, h = 89.5 },                                -- > Spot 02

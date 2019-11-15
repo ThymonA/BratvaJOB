@@ -1,6 +1,6 @@
 resource_manifest_version '44febabe-d386-4d18-afbe-5e627f4af937'
 
-description 'ESX Maffia job created by Tigo#0001'
+description 'ESX Bratva job created by Tigo#0001'
 
 version '1.0.0'
 
@@ -10,11 +10,13 @@ client_scripts {
     'config.lua',
     'shared/shared.lua',
     'client/menus/vehicle_menu.lua',
-    'client/menus/garage_menu.lua',
     'client/menus/clothing_menu.lua',
     'client/menus/safe_menu.lua',
     'client/menus/weapon_safe_menu.lua',
-    'client/menus/boss_menu.lua',
+    'client/menus/warehouse_menu.lua',
+    'client/menus/boss_menu/main.lua',
+    'client/menus/boss_menu/employee_menu.lua',
+    'client/menus/boss_menu/bank_menu.lua',
     'client/main.lua',
 }
 
@@ -25,11 +27,13 @@ server_scripts {
     'config.lua',
     'shared/shared.lua',
     'server/menus/vehicle_menu.lua',
-    'server/menus/garage_menu.lua',
     'server/menus/clothing_menu.lua',
     'server/menus/safe_menu.lua',
+    'server/menus/warehouse_menu.lua',
     'server/menus/weapon_safe_menu.lua',
-    'server/menus/boss_menu.lua',
+    'server/menus/boss_menu/main.lua',
+    'server/menus/boss_menu/employee_menu.lua',
+    'server/menus/boss_menu/bank_menu.lua',
     'server/main.lua'
 }
 

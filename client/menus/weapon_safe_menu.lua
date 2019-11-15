@@ -107,7 +107,7 @@ function BuyWeaponConfirm(weapon_name, weapon_price)
     table.insert(elements, { label = _U('yes_buy', format_num(weapon_price, 0, '€ ')), value = Action.Confirm })
 
     ESX.UI.Menu.Open(
-        'ml', GetCurrentResourceName(), 'buy_weapon',
+        'ml', GetCurrentResourceName(), 'buy_weapon_confirm',
         {
             title       = _U('buy_weapon', weapon_label),
             align       = 'top-left',
@@ -241,8 +241,10 @@ end
 function HasGrade(grade)
     local playerGrade = nil
 
-    if (PlayerData ~= nil and PlayerData.job ~= nil and PlayerData.job.grade_name ~= nil) then
+    if (PlayerData ~= nil and PlayerData.job ~= nil and string.lower(PlayerData.job.name) == string.lower(Config.JobName)) then
         playerGrade = string.lower(PlayerData.job.grade_name)
+    elseif (PlayerData ~= nil and PlayerData.job2 ~= nil and string.lower(PlayerData.job2.name) == string.lower(Config.JobName)) then
+        playerGrade = string.lower(PlayerData.job2.grade_name)
     end
 
     return string.lower(grade) == playerGrade

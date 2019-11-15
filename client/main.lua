@@ -23,7 +23,8 @@ local Action                    = {
     ChangeClothes   = 'ChangeClothes',
     OpenSafe        = 'OpenSafe',
     OpenWeaponSafe  = 'OpenWeaponSafe',
-    BossActions     = 'BossActions'
+    BossActions     = 'BossActions',
+    Warehouse       = 'Warehouse'
 }
 
 ESX                         = nil
@@ -55,6 +56,7 @@ Citizen.CreateThread(function()
             local clothingMarker = marker.Clothing
             local safeMarker = marker.Safe
             local bossMarker = marker.Boss
+            local warehouse = marker.Warehouse
 
             -- Locations
             local vehicleCircle = Config.Locations.VehicleCircleLocation
@@ -64,6 +66,7 @@ Citizen.CreateThread(function()
             local safeCircle = Config.Locations.SafeCircleLocation
             local weaponSafeCircle = Config.Locations.WeaponSafeCircleLocation
             local bossSafeCircle = Config.Locations.BossCircleLocation
+            local warehouseCircle = Config.Locations.WarehouseLocation
 
             if (Config.CanSpawnCars) then
                 if (GetDistanceBetweenCoords(coords, vehicleCircle.x, vehicleCircle.y, vehicleCircle.z, true) < Config.DrawDistance) then
@@ -94,6 +97,10 @@ Citizen.CreateThread(function()
             if (HasAccess(Config.RequiredGradesForBossActions) and GetDistanceBetweenCoords(coords, bossSafeCircle.x, bossSafeCircle.y, bossSafeCircle.z, true) < Config.DrawDistance) then
                 DrawMarker(marker.Type, bossSafeCircle.x, bossSafeCircle.y, bossSafeCircle.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, bossMarker.x, bossMarker.y, bossMarker.z, bossMarker.r, bossMarker.g, bossMarker.b, 100, false, true, 2, false, false, false, false)
             end
+
+            if (GetDistanceBetweenCoords(coords, warehouseCircle.x, warehouseCircle.y, warehouseCircle.z, true) < Config.DrawDistance) then
+                DrawMarker(marker.Type, warehouseCircle.x, warehouseCircle.y, warehouseCircle.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, warehouse.x, warehouse.y, warehouse.z, warehouse.r, warehouse.g, warehouse.b, 100, false, true, 2, false, false, false, false)
+            end
         end
 
         Citizen.Wait(0)
@@ -118,6 +125,7 @@ Citizen.CreateThread(function()
             local clothingMarker = marker.Clothing
             local safeMarker = marker.Safe
             local bossMarker = marker.Boss
+            local warehouse = marker.Warehouse
 
             -- Locations
             local vehicleCircle = Config.Locations.VehicleCircleLocation
@@ -127,6 +135,7 @@ Citizen.CreateThread(function()
             local safeCircle = Config.Locations.SafeCircleLocation
             local weaponSafeCircle = Config.Locations.WeaponSafeCircleLocation
             local bossSafeCircle = Config.Locations.BossCircleLocation
+            local warehouseCircle = Config.Locations.WarehouseLocation
             
             if (Config.CanSpawnCars) then
                 if (GetDistanceBetweenCoords(coords, vehicleCircle.x, vehicleCircle.y, vehicleCircle.z, true) < defaultMarker.x) then
@@ -163,6 +172,11 @@ Citizen.CreateThread(function()
             if (HasAccess(Config.RequiredGradesForBossActions) and GetDistanceBetweenCoords(coords, bossSafeCircle.x, bossSafeCircle.y, bossSafeCircle.z, true) < bossMarker.x) then
                 isInMarker = true
                 CurrentAction = Action.BossActions
+            end
+
+            if (GetDistanceBetweenCoords(coords, warehouseCircle.x, warehouseCircle.y, warehouseCircle.z, true) < warehouse.x) then
+                isInMarker = true
+                CurrentAction = Action.Warehouse
             end
 
             if (isInMarker and LastAction == nil) then
@@ -205,8 +219,9 @@ Citizen.CreateThread(function()
                     OpenClothingMenu()
                 end
 
-                if (IsCurrentAction(Action.OpenSafe)) then
-                    ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_safe'))
+                if (IsCurrentAction(Action.OpenSafe) or
+                    IsLastAction(Action.OpenSafe)) then
+                    OpenSafeMenu()
                 end
 
                 if (IsCurrentAction(Action.OpenWeaponSafe) or
@@ -217,6 +232,11 @@ Citizen.CreateThread(function()
                 if (HasAccess(Config.RequiredGradesForBossActions) and IsCurrentAction(Action.BossActions) or
                     HasAccess(Config.RequiredGradesForBossActions) and IsLastAction(Action.BossActions)) then
                     OpenBossMenu()
+                end
+
+                if (IsCurrentAction(Action.Warehouse) or
+                    IsLastAction(Action.Warehouse)) then
+                    OpenWarehouseMenu()
                 end
 
                 CurrentAction = nil
@@ -266,6 +286,10 @@ AddEventHandler('ml_' .. Config.JobName .. 'job:hasEnteredMarker', function()
 
         if (HasAccess(Config.RequiredGradesForBossActions) and IsCurrentAction(Action.BossActions)) then
             ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_boss_menu'))
+        end
+
+        if (IsCurrentAction(Action.Warehouse)) then
+            ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_warehouse'))
         end
     end
 end)
@@ -370,8 +394,10 @@ end
 function HasGrade(grade)
     local playerGrade = nil
 
-    if (PlayerData ~= nil and PlayerData.job ~= nil and PlayerData.job.grade_name ~= nil) then
+    if (PlayerData ~= nil and PlayerData.job ~= nil and string.lower(PlayerData.job.name) == string.lower(Config.JobName)) then
         playerGrade = string.lower(PlayerData.job.grade_name)
+    elseif (PlayerData ~= nil and PlayerData.job2 ~= nil and string.lower(PlayerData.job2.name) == string.lower(Config.JobName)) then
+        playerGrade = string.lower(PlayerData.job2.grade_name)
     end
 
     return string.lower(grade) == playerGrade

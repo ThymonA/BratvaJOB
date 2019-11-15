@@ -14,36 +14,6 @@ Citizen.CreateThread(function()
     PlayerData = ESX.GetPlayerData()
 end)
 
-function OpenBossMenu()
-    ESX.UI.Menu.CloseAll()
-
-    local elements = {
-        { label = _U('employee_menu'), value = 'employee_menu' },
-        { label = _U('dirty_money_menu'), value = 'dirty_money_menu' },
-        { label = _U('bank_menu'), value = 'bank_menu' },
-        { label = _U('society_management'), value = 'society_management_menu' },
-    }
-
-    ESX.UI.Menu.Open(
-        'ml',
-        GetCurrentResourceName(),
-        'boss_menu',
-        {
-            title       = _U('boss_menu'),
-            align       = 'top-left',
-            css         = Config.JobName,
-            elements    = elements
-        },
-        function(data, menu)
-            if (data.current.value == 'employee_menu') then
-                OpenEmployeeMenu()
-            end
-        end,
-        function(data, menu)
-            menu.close()
-        end)
-end
-
 function OpenEmployeeMenu()
     local elements = {
         { label = _U('list_employee'), value = 'list_employee' },
@@ -287,7 +257,7 @@ function OpenEmployeeFireMenu()
                         if (string.lower(employee.job2.grade_name) == 'boss') then
                             local jobGrade = employee.job2.grade
 
-                            ESX.TriggerServerCallback('mlx_society:hasRank', function (count)
+                            ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:rankCount', function (count)
                                 if (count <= 1) then
                                     ESX.ShowNotification(_U('you_cant_fire_boss', Config.JobLabel))
                                     return
@@ -564,23 +534,67 @@ function OpenDemotionMenu()
                                 for _, grade in pairs(grades) do
                                     if (grade.grade == data2.current.value) then
                                         if (string.lower(employee.job.name) == string.lower(Config.JobName)) then
-                                            ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:setJob', function()
-                                                ESX.ShowNotification(_U('you_have_demote', employee.name, grade.label, Config.JobLabel))
-                                                ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
-                                                        menu2.close()
-                                                        menu.close()
-                                                        OpenDemotionMenu()
-                                                end, employee.identifier, _U('you_demoted', grade.label, Config.JobLabel))
-                                            end, employee.identifier, Config.JobName, grade.grade)
+                                            if (string.lower(employee.job.grade_name) == string.lower('boss')) then
+                                                local jobGrade = employee.job.grade
+
+                                                ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:rankCount', function (count)
+                                                    if (count <= 1) then
+                                                        ESX.ShowNotification(_U('you_cant_demote_boss', Config.JobLabel))
+                                                        return
+                                                    end
+
+                                                    ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:setJob', function()
+                                                        ESX.ShowNotification(_U('you_have_demote', employee.name, grade.label, Config.JobLabel))
+                                                        ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
+                                                                menu2.close()
+                                                                menu.close()
+                                                                OpenDemotionMenu()
+                                                        end, employee.identifier, _U('you_demoted', grade.label, Config.JobLabel))
+                                                    end, employee.identifier, Config.JobName, grade.grade)
+
+                                                    return
+                                                end, jobGrade)
+                                            else
+                                                ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:setJob', function()
+                                                    ESX.ShowNotification(_U('you_have_demote', employee.name, grade.label, Config.JobLabel))
+                                                    ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
+                                                            menu2.close()
+                                                            menu.close()
+                                                            OpenDemotionMenu()
+                                                    end, employee.identifier, _U('you_demoted', grade.label, Config.JobLabel))
+                                                end, employee.identifier, Config.JobName, grade.grade)
+                                            end
                                         elseif (string.lower(employee.job2.name) == string.lower(Config.JobName)) then
-                                            ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:setJob2', function()
-                                                ESX.ShowNotification(_U('you_have_demote', employee.name, grade.label, Config.JobLabel))
-                                                ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
-                                                        menu2.close()
-                                                        menu.close()
-                                                        OpenDemotionMenu()
-                                                end, employee.identifier, _U('you_demoted', grade.label, Config.JobLabel))
-                                            end, employee.identifier, Config.JobName, grade.grade)
+                                            if (string.lower(employee.job2.grade_name) == 'boss') then
+                                                local jobGrade = employee.job2.grade
+
+                                                ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:rankCount', function (count)
+                                                    if (count <= 1) then
+                                                        ESX.ShowNotification(_U('you_cant_demote_boss', Config.JobLabel))
+                                                        return
+                                                    end
+
+                                                    ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:setJob2', function()
+                                                        ESX.ShowNotification(_U('you_have_demote', employee.name, grade.label, Config.JobLabel))
+                                                        ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
+                                                                menu2.close()
+                                                                menu.close()
+                                                                OpenDemotionMenu()
+                                                        end, employee.identifier, _U('you_demoted', grade.label, Config.JobLabel))
+                                                    end, employee.identifier, Config.JobName, grade.grade)
+
+                                                    return
+                                                end, jobGrade)
+                                            else
+                                                ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:setJob2', function()
+                                                    ESX.ShowNotification(_U('you_have_demote', employee.name, grade.label, Config.JobLabel))
+                                                    ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
+                                                            menu2.close()
+                                                            menu.close()
+                                                            OpenDemotionMenu()
+                                                    end, employee.identifier, _U('you_demoted', grade.label, Config.JobLabel))
+                                                end, employee.identifier, Config.JobName, grade.grade)
+                                            end
                                         end
                                     end
                                 end
@@ -595,16 +609,6 @@ function OpenDemotionMenu()
                 end)
         end)
     end)
-end
-
-function HasGrade(grade)
-    local playerGrade = nil
-
-    if (PlayerData ~= nil and PlayerData.job ~= nil and PlayerData.job.grade_name ~= nil) then
-        playerGrade = string.lower(PlayerData.job.grade_name)
-    end
-
-    return string.lower(grade) == playerGrade
 end
 
 function SortEmployees(item1, item2)

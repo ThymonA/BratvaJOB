@@ -68,7 +68,7 @@ function OpenClothingMenu()
 					end)
 
 				end)
-				
+
 				TriggerEvent('mlx:restoreLoadout')
       end
     end,
@@ -115,9 +115,11 @@ end
 
 function HasGrade(grade)
   local playerGrade = nil
-  
-  if (PlayerData ~= nil and PlayerData.job ~= nil and PlayerData.job.grade_name ~= nil) then
-    playerGrade = string.lower(PlayerData.job.grade_name)
+
+  if (PlayerData ~= nil and PlayerData.job ~= nil and string.lower(PlayerData.job.name) == string.lower(Config.JobName)) then
+      playerGrade = string.lower(PlayerData.job.grade_name)
+  elseif (PlayerData ~= nil and PlayerData.job2 ~= nil and string.lower(PlayerData.job2.name) == string.lower(Config.JobName)) then
+      playerGrade = string.lower(PlayerData.job2.grade_name)
   end
 
   return string.lower(grade) == playerGrade

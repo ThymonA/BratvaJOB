@@ -91,7 +91,11 @@ function OpenAddItemMenu()
                                 menu2.close()
                                 menu.close()
 
-                                ESX.ShowNotification(_U('put_products', data2.value, msg, Config.JobLabel))
+                                if (data.current.value == 'black_money') then
+                                    ESX.ShowNotification(_U('put_black_money', format_num(data2.value, 0, '€ '), msg, Config.JobLabel))
+                                else
+                                    ESX.ShowNotification(_U('put_products', format_num(data2.value, 0, ''), msg, Config.JobLabel))
+                                end
 
                                 OpenAddItemMenu()
                             elseif (msg == 'no_player') then
@@ -158,7 +162,11 @@ function OpenRemoveItemMenu()
                                 menu2.close()
                                 menu.close()
 
-                                ESX.ShowNotification(_U('get_products', data2.value, msg, Config.JobLabel))
+                                if (data.current.value == 'black_money') then
+                                    ESX.ShowNotification(_U('get_black_money', format_num(data2.value, 0, '€ '), msg, Config.JobLabel))
+                                else
+                                    ESX.ShowNotification(_U('get_products', format_num(data2.value, 0, ''), msg, Config.JobLabel))
+                                end
 
                                 OpenRemoveItemMenu()
                             elseif (msg == 'no_player') then

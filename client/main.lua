@@ -18,7 +18,6 @@ local Blips                     = {}
 local BlipsUpdated              = false
 local Action                    = {
     SpawnVehicle    = 'SpawnVehicle',
-    OpenGarage      = 'OpenGarage',
     ParkInGarage    = 'ParkInGarage',
     ChangeClothes   = 'ChangeClothes',
     OpenSafe        = 'OpenSafe',
@@ -60,7 +59,6 @@ Citizen.CreateThread(function()
 
             -- Locations
             local vehicleCircle = Config.Locations.VehicleCircleLocation
-            local garageCircle = Config.Locations.GarageCircleLocation
             local garageParkingCircle = Config.Locations.GarageParkingCircleLocation
             local clothingCircle = Config.Locations.ClothingCircleLocation
             local safeCircle = Config.Locations.SafeCircleLocation
@@ -72,10 +70,6 @@ Citizen.CreateThread(function()
                 if (GetDistanceBetweenCoords(coords, vehicleCircle.x, vehicleCircle.y, vehicleCircle.z, true) < Config.DrawDistance) then
                     DrawMarker(marker.Type, vehicleCircle.x, vehicleCircle.y, vehicleCircle.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, defaultMarker.x, defaultMarker.y, defaultMarker.z, defaultMarker.r, defaultMarker.g, defaultMarker.b, 100, false, true, 2, false, false, false, false)
                 end
-            end
-
-            if (GetDistanceBetweenCoords(coords, garageCircle.x, garageCircle.y, garageCircle.z, true) < Config.DrawDistance) then
-                DrawMarker(marker.Type, garageCircle.x, garageCircle.y, garageCircle.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, defaultMarker.x, defaultMarker.y, defaultMarker.z, defaultMarker.r, defaultMarker.g, defaultMarker.b, 100, false, true, 2, false, false, false, false)
             end
 
             if (GetDistanceBetweenCoords(coords, garageParkingCircle.x, garageParkingCircle.y, garageParkingCircle.z, true) < Config.DrawDistance) then
@@ -129,7 +123,6 @@ Citizen.CreateThread(function()
 
             -- Locations
             local vehicleCircle = Config.Locations.VehicleCircleLocation
-            local garageCircle = Config.Locations.GarageCircleLocation
             local garageParkingCircle = Config.Locations.GarageParkingCircleLocation
             local clothingCircle = Config.Locations.ClothingCircleLocation
             local safeCircle = Config.Locations.SafeCircleLocation
@@ -142,11 +135,6 @@ Citizen.CreateThread(function()
                     isInMarker = true
                     CurrentAction = Action.SpawnVehicle
                 end
-            end
-
-            if (GetDistanceBetweenCoords(coords, garageCircle.x, garageCircle.y, garageCircle.z, true) < defaultMarker.x) then
-                isInMarker = true
-                CurrentAction = Action.OpenGarage
             end
 
             if (GetDistanceBetweenCoords(coords, garageParkingCircle.x, garageParkingCircle.y, garageParkingCircle.z, true) < garageMarker.x) then
@@ -200,18 +188,28 @@ Citizen.CreateThread(function()
 		if CurrentAction ~= nil then
             if IsControlJustReleased(0, Keys['E']) then
                 LastAction = CurrentAction
-                
+                CurrentAction = nil
+
                 if (Config.CanSpawnCars and IsCurrentAction(Action.SpawnVehicle) or
                     IsLastAction(Action.SpawnVehicle)) then
                     OpenVehicleMenu()
                 end
 
-                if (IsCurrentAction(Action.OpenGarage)) then
-                    ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_garage'))
-                end
+                if (IsCurrentAction(Action.ParkInGarage) or
+                    IsLastAction(Action.ParkInGarage)) then
+                    local playerPed  = GetPlayerPed(-1)
+                    if IsPedInAnyVehicle(playerPed,  false) then
+                        local vehicle      = GetVehiclePedIsIn(playerPed, false)
 
-                if (IsCurrentAction(Action.ParkInGarage)) then
-                    ESX.ShowHelpNotification(_U('parking_' .. Config.JobName .. '_garage'))
+                        if (GetPedInVehicleSeat(vehicle, -1) ~= playerPed) then
+                            ESX.ShowNotification(_U('must_seat_driver'))
+                            return
+                        end
+
+                        ESX.Game.DeleteVehicle(vehicle)
+                    else
+                        ESX.ShowNotification(_U('no_vehicle_to_enter'))
+                    end
                 end
 
                 if (Config.CanChangeClothes and IsCurrentAction(Action.ChangeClothes) or
@@ -262,10 +260,6 @@ AddEventHandler('ml_' .. Config.JobName .. 'job:hasEnteredMarker', function()
     if (LastAction == nil) then
         if (Config.CanSpawnCars and IsCurrentAction(Action.SpawnVehicle)) then
             ESX.ShowHelpNotification(_U('spawn_' .. Config.JobName .. '_vehicle'))
-        end
-
-        if (IsCurrentAction(Action.OpenGarage)) then
-            ESX.ShowHelpNotification(_U('open_' .. Config.JobName .. '_garage'))
         end
 
         if (IsCurrentAction(Action.ParkInGarage)) then

@@ -105,5 +105,9 @@ Locales['nl'] = {
     ['cant_remove_item'] = 'U kunt dit item ~r~niet~s~ uit uw inventaris verwijderen',
     ['society_name'] = '<strong>Kluis</strong> %s',
     ['put_products'] = 'U heeft ~g~%s~s~ keer een ~g~%s~s~ in de kluis van de ~g~%s~s~ gedaan',
+    ['put_black_money'] = 'U heeft ~g~%s~s~ ~g~%s~s~ in de kluis van de ~g~%s~s~ gedaan',
     ['get_products'] = 'U heeft ~g~%s~s~ keer een ~g~%s~s~ uit de kluis van de ~g~%s~s~ gehaald',
+    ['get_black_money'] = 'U heeft ~g~%s~s~ ~g~%s~s~ uit de kluis van de ~g~%s~s~ gehaald',
+    ['put_all_products'] = 'U heeft ~g~%s~s~ keer ~g~%s~s~ in de kluis van de ~g~%s~s~ gedaan',
+    ['no_vehicle_to_enter'] = 'Er is geen voertuig om terug te zetten in uw garage',
 }

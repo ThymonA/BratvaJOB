@@ -77,7 +77,6 @@ Config.Marker = {                           -- Markers
 Config.Locations = {                                                                    -- All locations
     VehicleCircleLocation = { x = 503.83, y = -3121.95, z = 8.8 },                      -- Spawn car circle location
     VehicleSpawnLocation = { x = 489.37, y = -3130.89, z = 5.07, h = 359.5 },           -- Vehicle spawn location
-    GarageCircleLocation = { x = 507.05, y = -3138.03, z = 5.1 },                       -- Garage store location
     GarageParkingCircleLocation = { x = 475.61, y = -3149.61, z = 5.08, h = 164.5 },    -- Garage parking location
     GarageSpawnLocation = { x = 489.78, y = -3150.99, z = 5.1, h = 0.0 },               -- Garage spawn location
     ClothingCircleLocation = { x = 562.82, y = -3121.15, z = 17.78 },                   -- Clothing location
@@ -85,16 +84,6 @@ Config.Locations = {                                                            
     WeaponSafeCircleLocation = { x = 575.41, y = -3121.4, z = 17.77 },                  -- Weapon safe location
     BossCircleLocation = { x = 569.88, y = -3126.8, z = 17.78 },                        -- Boss location
     WarehouseLocation = { x = 470.75, y = -3133.39, z = 5.08 },                         -- Warehouse location
-    GarageSpotLocations = {                                                             -- Garage spots
-        { x = 509.00, y = -3143.00, z = 5.1, h = 89.5 },                                -- > Spot 01
-        { x = 509.00, y = -3146.00, z = 5.1, h = 89.5 },                                -- > Spot 02
-        { x = 509.00, y = -3149.00, z = 5.1, h = 89.5 },                                -- > Spot 03
-        { x = 509.00, y = -3152.00, z = 5.1, h = 89.5 },                                -- > Spot 04
-        { x = 500.00, y = -3143.00, z = 5.1, h = 270.5 },                               -- > Spot 05
-        { x = 500.00, y = -3146.00, z = 5.1, h = 270.5 },                               -- > Spot 06
-        { x = 500.00, y = -3149.00, z = 5.1, h = 270.5 },                               -- > Spot 07
-        { x = 500.00, y = -3152.00, z = 5.1, h = 270.5 },                               -- > Spot 08
-    }
 }
 
 Config.Outfits = {

@@ -19,9 +19,9 @@ function OpenBankMenu()
         ESX.UI.Menu.Open(
             'ml',
             GetCurrentResourceName(),
-            'employee_menu',
+            'bank_menu',
             {
-                title       = _U('employee_menu'),
+                title       = _U('bank_menu'),
                 align       = 'top-left',
                 css         = Config.JobName,
                 elements    = {

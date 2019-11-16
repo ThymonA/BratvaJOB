@@ -36,6 +36,8 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:getTrunk', function(s
 end)
 
 ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:updateTrunkItem', function(source, cb, plate, item_name)
+    local xPlayer = ESX.GetPlayerFromId(source)
+
     TriggerEvent('mlx_trunk:getSharedDataStore', plate, function(store)
         if (item_name == 'black_money') then
             local blackMoney = 0
@@ -58,7 +60,14 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:updateTrunkItem', fun
 
             TriggerEvent('mlx_addonaccount:getSharedAccount', 'society_' .. Config.JobName .. '_black_money', function(account)
                 account.addMoney(blackMoney)
-    
+
+                LogToDiscord(
+                    Config.DiscordLogs.MoneyLog,
+                    _U('discord_deposit_black_money', Config.JobLabel), 
+                    xPlayer.name .. ' > ' .. format_num(blackMoney, 0, '€ ') .. ' ' .. _U('discord_black_money'),
+                    Config.DiscordLogs.Colors.Green,
+                    xPlayer.identifier)
+
                 cb(true, _U('blackmoney'), format_num(blackMoney, 0, '€ '))
                 return
             end)
@@ -104,6 +113,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:updateTrunkItem', fun
                     store.set('weapons', _weapons)
                     jobStore.set('weapons', weapons)
 
+                    LogToDiscord(
+                        Config.DiscordLogs.SafeLog,
+                        _U('discord_deposit_weapon', Config.JobLabel), 
+                        xPlayer.name .. ' > ' .. weapon_label,
+                        Config.DiscordLogs.Colors.Green,
+                        xPlayer.identifier)
+
                     cb(true, weapon_label, format_num(1, 0, ''))
                     return
                 end)
@@ -132,6 +148,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:updateTrunkItem', fun
 
                     store.set('coffre', _trunk)
                     inventory.addItem(item.name, item.count)
+
+                    LogToDiscord(
+                        Config.DiscordLogs.SafeLog,
+                        _U('discord_deposit_item', Config.JobLabel), 
+                        xPlayer.name .. ' > ' .. format_num(item.count, 0, '') .. ' ' .. item.name,
+                        Config.DiscordLogs.Colors.Green,
+                        xPlayer.identifier)
 
                     cb(true, item.name, format_num(item.count, 0, ''))
                     return

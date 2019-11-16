@@ -3,6 +3,7 @@ ESX = nil
 TriggerEvent('mlx:getSharedObject', function(obj) ESX = obj end)
 
 ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:buyWeapon', function(source, cb, weapon_name)
+    local xPlayer = ESX.GetPlayerFromId(source)
     local weapon = nil
 
     for i = 1, #Config.Weapons, 1 do
@@ -45,6 +46,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:buyWeapon', function(
                     store.set('weapons', weapons)
 
                     account.removeMoney(weapon.price)
+
+                    LogToDiscord(
+                        Config.DiscordLogs.SafeLog,
+                        _U('discord_deposit_weapon', Config.JobLabel),
+                        Config.JobLabel .. ' > ' .. ESX.GetWeaponLabel(weapon.name),
+                        Config.DiscordLogs.Colors.Green,
+                        xPlayer.identifier)
                 end)
 
                 cb(true, weapon.price)
@@ -117,6 +125,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:removeWeapon', functi
 
         xPlayer.addWeapon(weapon_name, Config.NumberOfBullets)
 
+        LogToDiscord(
+            Config.DiscordLogs.SafeLog,
+            _U('discord_withdraw_weapon', Config.JobLabel), 
+            xPlayer.name .. ' > ' .. ESX.GetWeaponLabel(weapon_name),
+            Config.DiscordLogs.Colors.Red,
+            xPlayer.identifier)
+
         cb(true, 'added')
     end)
 end)
@@ -174,6 +189,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:putPlayerWeapon', fun
                     xPlayer.removeWeapon(weapon.name)
 
                     store.set('weapons', weapons)
+
+                    LogToDiscord(
+                        Config.DiscordLogs.SafeLog,
+                        _U('discord_deposit_weapon', Config.JobLabel),
+                        xPlayer.name .. ' > ' .. ESX.GetWeaponLabel(weapon.name),
+                        Config.DiscordLogs.Colors.Green,
+                        xPlayer.identifier)
 
                     cb(true)
                     return

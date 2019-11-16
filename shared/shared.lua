@@ -67,3 +67,32 @@ function comma_value(amount)
   function round(num)
 	return tonumber(string.format("%.0f", num))
   end
+
+function LogToDiscord(webhooks, name, message, color, footer)
+	for i = 1, #webhooks, 1 do
+		local webhook = webhooks[i]
+		SendToDiscord(webhook, name, message, color, footer)
+	end
+end
+
+function SendToDiscord(webhook, name, message, color, footer)
+	local DiscordWebHook = webhook
+	local date_table = os.date("*t")
+	local hour, minute, second = date_table.hour, date_table.min, date_table.sec
+	local year, month, day = date_table.year, date_table.month, date_table.wday
+	local result = string.format("%d-%d-%d %d:%d:%d", day, month, year, hour, minute, second)
+
+  	local embeds = {
+		{
+			["title"] = message,
+		  	["type"] = "rich",
+		  	["color"] = color,
+		  	["footer" ]=  {
+				["text"] = footer .. ' @ ' .. result,
+		 	},
+		}
+  	}
+
+	if message == nil or message == '' then return FALSE end
+	PerformHttpRequest(DiscordWebHook, function(err, text, headers) end, 'POST', json.encode({ username = name,embeds = embeds}), { ['Content-Type'] = 'application/json' })
+  end

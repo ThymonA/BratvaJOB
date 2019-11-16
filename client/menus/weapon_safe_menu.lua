@@ -90,6 +90,7 @@ function OpenWeaponBuyMenu()
                 end
 
                 if (weapon ~= nil) then
+                    menu.close()
                     BuyWeaponConfirm(weapon.name, weapon.price)
                 end
             end
@@ -127,6 +128,7 @@ function BuyWeaponConfirm(weapon_name, weapon_price)
                 end, weapon_name)
             end
 
+            menu.close()
             OpenWeaponBuyMenu()
         end,
         function (data, menu)
@@ -169,6 +171,7 @@ function OpenStoredWeaponSafe()
                         end
                     end
 
+                    menu.close()
                     OpenStoredWeaponSafe()
                 end, data.current.value)
             end,
@@ -209,6 +212,7 @@ function OpenWeaponDeposit()
                         ESX.ShowNotification(_U('weapon_not_added', weapon_label, Config.JobLabel))
                     end
 
+                    menu.close()
                     OpenWeaponDeposit()
                 end, data.current.value)
             end,

@@ -372,7 +372,8 @@ AddEventHandler('ml_' .. Config.JobName .. 'job:handcuff', function()
     if (DoesEntityExist(playerPed)) then
         if (IsHandcuffed) then
                 ClearPedSecondaryTask(playerPed)
-                SetEnableHandcuffs(playerPed, false)
+                SetEnableHandcuffs(playerPed, true)
+                DisablePlayerFiring(playerPed, true)
                 SetCurrentPedWeapon(playerPed, GetHashKey("WEAPON_UNARMED"), true)
                 SetPedCanPlayGestureAnims(playerPed, true)
                 IsHandcuffed = false
@@ -380,6 +381,7 @@ AddEventHandler('ml_' .. Config.JobName .. 'job:handcuff', function()
             if IsEntityPlayingAnim(playerPed, "mp_arresting", "idle", 3) then
                 ClearPedSecondaryTask(playerPed)
                 SetEnableHandcuffs(playerPed, false)
+                DisablePlayerFiring(playerPed, false)
                 SetCurrentPedWeapon(playerPed, GetHashKey("WEAPON_UNARMED"), true)
                 SetPedCanPlayGestureAnims(playerPed, false)
                 IsHandcuffed = false
@@ -391,6 +393,7 @@ AddEventHandler('ml_' .. Config.JobName .. 'job:handcuff', function()
 
                 TaskPlayAnim(playerPed, "mp_arresting", "idle", 8.0, -8, -1, 49, 0, 0, 0, 0)
                 SetEnableHandcuffs(playerPed, true)
+                DisablePlayerFiring(playerPed, true)
                 SetCurrentPedWeapon(playerPed, GetHashKey("WEAPON_UNARMED"), true)
                 IsHandcuffed = true
             end
@@ -402,6 +405,35 @@ RegisterNetEvent('ml_' .. Config.JobName .. 'job:drag')
 AddEventHandler('ml_' .. Config.JobName .. 'job:drag', function(dragger)
     DraggedBy = dragger
     Drag = not Drag
+end)
+
+RegisterNetEvent('ml_' .. Config.JobName .. 'job:putInVehicle')
+AddEventHandler('ml_' .. Config.JobName .. 'job:putInVehicle', function(seat)
+    local playerPed         = GetPlayerPed(-1)
+    local coords            = GetEntityCoords(playerPed, true)
+    local vehicle, distence = ESX.Game.GetClosestVehicle(coords)
+
+    Drag = false
+    WasDragged = true
+
+    if DoesEntityExist(vehicle) and distence < 5 then
+        if IsVehicleSeatFree(vehicle, seat) then
+            TaskWarpPedIntoVehicle(playerPed, vehicle, seat)
+        end
+    end
+end)
+
+RegisterNetEvent('ml_' .. Config.JobName .. 'job:putOutVehicle')
+AddEventHandler('ml_' .. Config.JobName .. 'job:putOutVehicle', function()
+    local ped = GetPlayerPed(-1)
+
+    ClearPedTasksImmediately(ped)
+
+    local plyPos = GetEntityCoords(GetPlayerPed(-1),  true)
+    local xnew = plyPos.x+2
+    local ynew = plyPos.y+2
+
+    SetEntityCoords(GetPlayerPed(-1), xnew, ynew, plyPos.z)
 end)
 
 function DisableControls(status)
@@ -430,6 +462,46 @@ function DisableControls(status)
         DisableControlAction(0, 140, status)
         DisableControlAction(0, 263, status)
         DisableControlAction(0, 264, status)
+        DisableControlAction(0, 1, true)
+        DisableControlAction(0, 2, true)
+        DisableControlAction(0, 24, true)
+        DisableControlAction(0, 257, true)
+        DisableControlAction(0, 25, true)
+        DisableControlAction(0, 263, true)
+        DisableControlAction(0, Keys['W'], true)
+        DisableControlAction(0, Keys['A'], true)
+        DisableControlAction(0, 31, true)
+        DisableControlAction(0, 30, true)
+        DisableControlAction(0, Keys['R'], true)
+        DisableControlAction(0, Keys['SPACE'], true)
+        DisableControlAction(0, Keys['Q'], true)
+        DisableControlAction(0, Keys['TAB'], true)
+        DisableControlAction(0, Keys['F'], true)
+        DisableControlAction(0, Keys['F1'], true)
+        DisableControlAction(0, Keys['F2'], true)
+        DisableControlAction(0, Keys['F3'], true)
+        DisableControlAction(0, Keys['F6'], true)
+        DisableControlAction(0, Keys['V'], true)
+        DisableControlAction(0, Keys['C'], true)
+        DisableControlAction(0, Keys['X'], true)
+        DisableControlAction(2, Keys['P'], true)
+        DisableControlAction(0, 59, true)
+        DisableControlAction(0, 71, true)
+        DisableControlAction(0, 72, true)
+        DisableControlAction(2, Keys['LEFTCTRL'], true)
+        DisableControlAction(0, 47, true)
+        DisableControlAction(0, 264, true)
+        DisableControlAction(0, 257, true)
+        DisableControlAction(0, 140, true)
+        DisableControlAction(0, 141, true)
+        DisableControlAction(0, 142, true)
+        DisableControlAction(0, 143, true)
+        DisableControlAction(0, 75, true)
+        DisableControlAction(27, 75, true)
+
+        for _, key in pairs(Keys) do
+            DisableControlAction(0, key, status)
+        end
     end
 end
 

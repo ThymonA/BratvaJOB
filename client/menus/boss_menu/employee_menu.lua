@@ -156,7 +156,7 @@ function OpenEmployeeHireMenu()
                                     menu.close()
                                     OpenEmployeeHireMenu()
                             end, employee.identifier, _U('you_hired', Config.JobLabel))
-                        end, employee.identifier, Config.JobName, 0)
+                        end, employee, Config.JobName, 0)
                     elseif (data2.value == 'secondary') then
                         ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:setJob2', function()
                             ESX.ShowNotification(_U('you_have_hire', employee.name, Config.JobLabel))
@@ -165,7 +165,7 @@ function OpenEmployeeHireMenu()
                                     menu.close()
                                     OpenEmployeeHireMenu()
                             end, employee.identifier, _U('you_hired', Config.JobLabel))
-                        end, employee.identifier, Config.JobName, 0)
+                        end, employee, Config.JobName, 0)
                     end
                 end,
                 function(data, menu)
@@ -239,7 +239,7 @@ function OpenEmployeeFireMenu()
                                     ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
                                         OpenEmployeeFireMenu()
                                     end, employee.identifier, _U('you_fired', Config.JobLabel))
-                                end, employee.identifier, 'Kansloos', 0)
+                                end, employee, 'Kansloos', 0)
 
                                 return
                             end, jobGrade)
@@ -249,7 +249,7 @@ function OpenEmployeeFireMenu()
                                 ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
                                     OpenEmployeeFireMenu()
                                 end, employee.identifier, _U('you_fired', Config.JobLabel))
-                            end, employee.identifier, 'Kansloos', 0)
+                            end, employee, 'Kansloos', 0)
                         end
                     end
 
@@ -268,7 +268,7 @@ function OpenEmployeeFireMenu()
                                     ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
                                         OpenEmployeeFireMenu()
                                     end, employee.identifier, _U('you_fired', Config.JobLabel))
-                                end, employee.identifier, 'Leeg', 0)
+                                end, employee, 'Leeg', 0)
 
                                 return
                             end, jobGrade)
@@ -278,7 +278,7 @@ function OpenEmployeeFireMenu()
                                 ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function()
                                     OpenEmployeeFireMenu()
                                 end, employee.identifier, _U('you_fired', Config.JobLabel))
-                            end, employee.identifier, 'Leeg', 0)
+                            end, employee, 'Leeg', 0)
                         end
                     end
                 end
@@ -402,7 +402,7 @@ function OpenPromitionMenu()
                                                         menu.close()
                                                         OpenPromitionMenu()
                                                 end, employee.identifier, _U('you_promoted', grade.label, Config.JobLabel))
-                                            end, employee.identifier, Config.JobName, grade.grade)
+                                            end, employee, Config.JobName, grade.grade)
                                         elseif (string.lower(employee.job2.name) == string.lower(Config.JobName)) then
                                             ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:setJob2', function()
                                                 ESX.ShowNotification(_U('you_have_promote', employee.name, grade.label, Config.JobLabel))
@@ -411,7 +411,7 @@ function OpenPromitionMenu()
                                                         menu.close()
                                                         OpenPromitionMenu()
                                                 end, employee.identifier, _U('you_promoted', grade.label, Config.JobLabel))
-                                            end, employee.identifier, Config.JobName, grade.grade)
+                                            end, employee, Config.JobName, grade.grade)
                                         end
                                     end
                                 end
@@ -550,7 +550,7 @@ function OpenDemotionMenu()
                                                                 menu.close()
                                                                 OpenDemotionMenu()
                                                         end, employee.identifier, _U('you_demoted', grade.label, Config.JobLabel))
-                                                    end, employee.identifier, Config.JobName, grade.grade)
+                                                    end, employee, Config.JobName, grade.grade)
 
                                                     return
                                                 end, jobGrade)
@@ -562,7 +562,7 @@ function OpenDemotionMenu()
                                                             menu.close()
                                                             OpenDemotionMenu()
                                                     end, employee.identifier, _U('you_demoted', grade.label, Config.JobLabel))
-                                                end, employee.identifier, Config.JobName, grade.grade)
+                                                end, employee, Config.JobName, grade.grade)
                                             end
                                         elseif (string.lower(employee.job2.name) == string.lower(Config.JobName)) then
                                             if (string.lower(employee.job2.grade_name) == 'boss') then
@@ -581,7 +581,7 @@ function OpenDemotionMenu()
                                                                 menu.close()
                                                                 OpenDemotionMenu()
                                                         end, employee.identifier, _U('you_demoted', grade.label, Config.JobLabel))
-                                                    end, employee.identifier, Config.JobName, grade.grade)
+                                                    end, employee, Config.JobName, grade.grade)
 
                                                     return
                                                 end, jobGrade)
@@ -593,7 +593,7 @@ function OpenDemotionMenu()
                                                             menu.close()
                                                             OpenDemotionMenu()
                                                     end, employee.identifier, _U('you_demoted', grade.label, Config.JobLabel))
-                                                end, employee.identifier, Config.JobName, grade.grade)
+                                                end, employee, Config.JobName, grade.grade)
                                             end
                                         end
                                     end

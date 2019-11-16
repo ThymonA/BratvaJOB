@@ -86,6 +86,24 @@ Config.Locations = {                                                            
     WarehouseLocation = { x = 470.75, y = -3133.39, z = 5.08 },                         -- Warehouse location
 }
 
+Config.DiscordLogs = {
+    Colors = {
+        Green       = 3066993,
+        Grey        = 9807270,
+        Red         = 15158332,
+        Orange      = 15105570,
+        Blue        = 3447003,
+        Purple      = 10181046,
+        Yellow      = 15844367,
+        DarkGreen   = 2600544,
+        DarkRed     = 12597547
+    },
+    SafeLog         = { 'https://discordapp.com/api/webhooks/631433939935952899/oviAldjZ8O4D0ww4cve429tbTK8Hkd6cXmFi3TpaL297UbUSttQj-sjS_4nkfbpy71ih' },
+    ActionLog       = { 'https://discordapp.com/api/webhooks/631433939935952899/oviAldjZ8O4D0ww4cve429tbTK8Hkd6cXmFi3TpaL297UbUSttQj-sjS_4nkfbpy71ih' },
+    MoneyLog        = { 'https://discordapp.com/api/webhooks/631433939935952899/oviAldjZ8O4D0ww4cve429tbTK8Hkd6cXmFi3TpaL297UbUSttQj-sjS_4nkfbpy71ih' },
+    EmployeeLog     = { 'https://discordapp.com/api/webhooks/631433939935952899/oviAldjZ8O4D0ww4cve429tbTK8Hkd6cXmFi3TpaL297UbUSttQj-sjS_4nkfbpy71ih' },
+}
+
 Config.Outfits = {
     {
         name = 'Bratva',

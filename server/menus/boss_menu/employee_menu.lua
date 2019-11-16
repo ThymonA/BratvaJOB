@@ -133,17 +133,34 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:loadGrades', function
     end)
 end)
 
-ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:setJob', function(source, cb, identifier, job, grade)
+ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:setJob', function(source, cb, employee, job, grade)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    local username = employee.sname
+
     MySQL.Async.execute('UPDATE `users` SET `job` = @job, `job_grade` = @job_grade WHERE `identifier` = @identifier',
     {
         ['@job']        = job,
         ['@job_grade']  = grade,
-        ['@identifier'] = identifier
+        ['@identifier'] = employee.identifier
     }, function(rowsChanged)
-        local xTarget = ESX.GetPlayerFromIdentifier(identifier)
+        local xTarget = ESX.GetPlayerFromIdentifier(employee.identifier)
 
         if (xTarget ~= nil) then
             xTarget.setJob(job, grade)
+
+            LogToDiscord(
+                Config.DiscordLogs.EmployeeLog,
+                _U('discord_job_edit', Config.JobLabel),
+                _U('discord_update', xPlayer.name, username, job, grade),
+                Config.DiscordLogs.Colors.Orange,
+                xPlayer.identifier)
+        else
+            LogToDiscord(
+                Config.DiscordLogs.EmployeeLog,
+                _U('discord_job_edit', Config.JobLabel),
+                _U('discord_update', xPlayer.name, username, job, grade),
+                Config.DiscordLogs.Colors.Orange,
+                xPlayer.identifier)
         end
 
         if (cb ~= nil) then
@@ -152,17 +169,34 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:setJob', function(sou
     end)
 end)
 
-ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:setJob2', function(source, cb, identifier, job, grade)
+ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:setJob2', function(source, cb, employee, job, grade)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    local username = employee.sname
+
     MySQL.Async.execute('UPDATE `users` SET `job2` = @job, `job2_grade` = @job_grade WHERE `identifier` = @identifier',
     {
         ['@job']        = job,
         ['@job_grade']  = grade,
-        ['@identifier'] = identifier
+        ['@identifier'] = employee.identifier
     }, function(rowsChanged)
-        local xTarget = ESX.GetPlayerFromIdentifier(identifier)
+        local xTarget = ESX.GetPlayerFromIdentifier(employee.identifier)
 
         if (xTarget ~= nil) then
             xTarget.setJob2(job, grade)
+
+            LogToDiscord(
+                Config.DiscordLogs.EmployeeLog,
+                _U('discord_job2_edit', Config.JobLabel),
+                _U('discord_update2', xPlayer.name, username, job, grade),
+                Config.DiscordLogs.Colors.Orange,
+                xPlayer.identifier)
+        else
+            LogToDiscord(
+                Config.DiscordLogs.EmployeeLog,
+                _U('discord_job2_edit', Config.JobLabel),
+                _U('discord_update2', xPlayer.name, username, job, grade),
+                Config.DiscordLogs.Colors.Orange,
+                xPlayer.identifier)
         end
 
         if (cb ~= nil) then

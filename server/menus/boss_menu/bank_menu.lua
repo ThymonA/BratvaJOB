@@ -10,6 +10,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:withdrawMoney', funct
 			account.removeMoney(amount)
 			xPlayer.addMoney(amount)
 
+			LogToDiscord(
+				Config.DiscordLogs.MoneyLog,
+				_U('discord_withdraw_money', Config.JobLabel), 
+				xPlayer.name .. ' > ' .. format_num(amount, 0, '€ ') .. ' ' .. _U('discord_money'),
+				Config.DiscordLogs.Colors.Red,
+				xPlayer.identifier)
+
 			TriggerClientEvent('mlx:showNotification', xPlayer.source, _U('money_withdrawed', format_num(amount, 0, '€ '), Config.JobLabel))
 		else
 			TriggerClientEvent('mlx:showNotification', xPlayer.source, _U('invalid_amount'))
@@ -28,6 +35,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:depositMoney', functi
 			account.addMoney(amount)
 		end)
 
+		LogToDiscord(
+			Config.DiscordLogs.MoneyLog,
+			_U('discord_deposit_money', Config.JobLabel), 
+			xPlayer.name .. ' > ' .. format_num(amount, 0, '€ ') .. ' ' .. _U('discord_money'),
+			Config.DiscordLogs.Colors.Green,
+			xPlayer.identifier)
+
 		TriggerClientEvent('mlx:showNotification', xPlayer.source, _U('money_deposit', format_num(amount, 0, '€ '), Config.JobLabel))
 
 	else
@@ -43,7 +57,14 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:withdrawBlackMoney', 
 	TriggerEvent('mlx_addonaccount:getSharedAccount', 'society_' .. Config.JobName .. '_black_money', function(account)
 		if amount > 0 and account.money >= amount then
 			account.removeMoney(amount)
-			xPlayer.addAccountMoney(amount)
+			xPlayer.addAccountMoney('black_money', amount)
+
+			LogToDiscord(
+				Config.DiscordLogs.MoneyLog,
+				_U('discord_withdraw_black_money', Config.JobLabel), 
+				xPlayer.name .. ' > ' .. format_num(amount, 0, '€ ') .. ' ' .. _U('discord_black_money'),
+				Config.DiscordLogs.Colors.Red,
+				xPlayer.identifier)
 
 			TriggerClientEvent('mlx:showNotification', xPlayer.source, _U('black_money_withdrawed', format_num(amount, 0, '€ '), Config.JobLabel))
 		else

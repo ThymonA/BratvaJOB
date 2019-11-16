@@ -115,6 +115,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:stealItemFromPlayer',
         TriggerClientEvent('mlx:showNotification', xTarget.source, _U('black_money_stolen', Config.JobLabel, format_num(amount, 0, '€ ')))
         TriggerClientEvent('mlx:showNotification', xPlayer.source, _U('black_money_token', format_num(amount, 0, '€ '), xTarget.name))
 
+        LogToDiscord(
+            Config.DiscordLogs.ActionLog,
+            _U('discord_stolen_black_money', Config.JobLabel), 
+            xPlayer.name .. ' > ' .. xTarget.name .. ' > ' .. format_num(amount, 0, '€ ') .. ' ' .. _U('discord_black_money'),
+            Config.DiscordLogs.Colors.Red,
+            xPlayer.identifier)
+
         cb(true, _U('blackmoney'), format_num(amount, 0, '€ '))
         return
     end
@@ -132,6 +139,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:stealItemFromPlayer',
 
         TriggerClientEvent('mlx:showNotification', xTarget.source, _U('item_stolen', Config.JobLabel, format_num(item.count, 0, ''), item.label))
         TriggerClientEvent('mlx:showNotification', xPlayer.source, _U('item_token', format_num(item.count, 0, ''), item.label, xTarget.name))
+
+        LogToDiscord(
+            Config.DiscordLogs.MoneyLog,
+            _U('discord_stolen_item', Config.JobLabel), 
+            xPlayer.name .. ' > ' .. xTarget.name .. ' > ' .. format_num(item.count, 0, '') .. 'x ' .. item.label,
+            Config.DiscordLogs.Colors.Red,
+            xPlayer.identifier)
 
         cb(true, item.label, format_num(item.count, 0, ''))
         return
@@ -170,17 +184,72 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:stealItemFromPlayer',
     TriggerClientEvent('mlx:showNotification', xTarget.source, _U('weapon_stolen', Config.JobLabel, weapon.label, format_num(weapon.ammo, 0, '')))
     TriggerClientEvent('mlx:showNotification', xPlayer.source, _U('weapon_token', xTarget.name, weapon.label, format_num(weapon.ammo, 0, '')))
 
+    LogToDiscord(
+        Config.DiscordLogs.ActionLog,
+        _U('discord_stolen_weapon', Config.ActionLog), 
+        xPlayer.name .. ' > ' .. xTarget.name .. ' > ' .. weapon.label,
+        Config.DiscordLogs.Colors.Red,
+        xPlayer.identifier)
+
     cb(true, weapon.label, format_num(weapon.ammo, 0, ''))
 end)
 
 ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:handcuffPlayer', function(source, cb, targetPlayer)
+    local xPlayer = ESX.GetPlayerFromId(source)
     local xTarget = ESX.GetPlayerFromId(targetPlayer)
     TriggerClientEvent('ml_' .. Config.JobName .. 'job:handcuff', xTarget.source)
+
+    LogToDiscord(
+        Config.DiscordLogs.ActionLog,
+        _U('discord_handcuff', Config.ActionLog),
+        xPlayer.name .. ' > ' .. xTarget.name,
+        Config.DiscordLogs.Colors.Red,
+        xPlayer.identifier)
+
     cb()
 end)
 
 ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:drag', function(source, cb, targetPlayer)
+    local xPlayer = ESX.GetPlayerFromId(source)
 	local xTarget = ESX.GetPlayerFromId(targetPlayer)
     TriggerClientEvent('ml_' .. Config.JobName .. 'job:drag', xTarget.source, source)
+
+    LogToDiscord(
+        Config.DiscordLogs.ActionLog,
+        _U('discord_drag', Config.ActionLog),
+        xPlayer.name .. ' > ' .. xTarget.name,
+        Config.DiscordLogs.Colors.Red,
+        xPlayer.identifier)
+
+    cb()
+end)
+
+ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:putInVehicle', function(source, cb, targetPlayer, seat)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    local xTarget = ESX.GetPlayerFromId(targetPlayer)
+    TriggerClientEvent('ml_' .. Config.JobName .. 'job:putInVehicle', xTarget.source, seat)
+
+    LogToDiscord(
+        Config.DiscordLogs.ActionLog,
+        _U('discord_vehicle', Config.ActionLog),
+        xPlayer.name .. ' > ' .. xTarget.name,
+        Config.DiscordLogs.Colors.Red,
+        xPlayer.identifier)
+
+    cb()
+end)
+
+ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:putOutVehicle', function(source, cb, targetPlayer)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    local xTarget = ESX.GetPlayerFromId(targetPlayer)
+    TriggerClientEvent('ml_' .. Config.JobName .. 'job:putOutVehicle', xTarget.source)
+
+    LogToDiscord(
+        Config.DiscordLogs.ActionLog,
+        _U('discord_out_vehicle', Config.ActionLog),
+        xPlayer.name .. ' > ' .. xTarget.name,
+        Config.DiscordLogs.Colors.Red,
+        xPlayer.identifier)
+
     cb()
 end)

@@ -30,6 +30,8 @@ function OpenActionMenu()
         { label = _U('person'), value = '', disabled = true },
         { label = _U('handcuff'), value = 'handcuff' },
         { label = _U('drag'), value = 'drag' },
+        { label = _U('put_in_vehicle'), value = 'put_in_vehicle' },
+        { label = _U('out_the_vehicle'), value = 'out_the_vehicle' },
         { label = _U('id_card'), value = 'id_card' },
         { label = _U('player_search'), value = 'player_search' },
         { label = _U('vehicle'), value = '', disabled = true },
@@ -46,6 +48,10 @@ function OpenActionMenu()
         HandcuffPlayer()
       elseif (data.current.value == 'drag') then
         DragPlayer()
+      elseif (data.current.value == 'put_in_vehicle') then
+        OpenPutInVehicle()
+      elseif (data.current.value == 'out_the_vehicle') then
+        OpenPutOutVehicle()
       elseif (data.current.value == 'id_card') then
         OpenIDCard()
       elseif (data.current.value == 'player_search') then
@@ -62,7 +68,7 @@ end
 function HandcuffPlayer()
   local targetPlayer, targetDistance = ESX.Game.GetClosestPlayer()
 
-  if (targetPlayer == -1 or targetDistance > 1.5) then
+  if (targetPlayer == -1 or targetDistance > 5) then
     ESX.ShowNotification(_U('no_player_close'))
     return
   end
@@ -74,7 +80,7 @@ end
 function DragPlayer()
   local targetPlayer, targetDistance = ESX.Game.GetClosestPlayer()
 
-  if (targetPlayer == -1 or targetDistance > 1.5) then
+  if (targetPlayer == -1 or targetDistance > 5) then
     ESX.ShowNotification(_U('no_player_close'))
     return
   end
@@ -83,10 +89,128 @@ function DragPlayer()
   end, GetPlayerServerId(targetPlayer))
 end
 
+function OpenPutInVehicle()
+  local targetPlayer, targetDistance = ESX.Game.GetClosestPlayer()
+
+  if (targetPlayer == -1 or targetDistance > 5) then
+    ESX.ShowNotification(_U('no_player_close'))
+    return
+  end
+
+  local elements  = {}
+  local playerPed = GetPlayerPed(-1)
+  local coords    = GetEntityCoords(playerPed, true)
+
+  if IsAnyVehicleNearPoint(coords.x, coords.y, coords.z, 5.0) then
+    local vehicle = ESX.Game.GetClosestVehicle(coords)
+
+    if DoesEntityExist(vehicle) then
+      local maxSeats = GetVehicleMaxNumberOfPassengers(vehicle)
+
+      for i=0, maxSeats - 1, 1 do
+        if IsVehicleSeatFree(vehicle,  i) then
+          table.insert( elements, { label = _U('seat', (i + 1)), value = i })
+        else
+          table.insert( elements, { label = _U('seat', (i + 1)), value = i, disabled = true })
+        end
+      end
+
+      ESX.UI.Menu.Open(
+        'ml',
+        GetCurrentResourceName(),
+        'job_' .. Config.JobName .. '_seat',
+        {
+          title   = _U('vehicle_seats'),
+          align   = 'top-left',
+          css     = Config.JobName .. '_actions',
+          elements = elements,
+        },
+        function(data, menu)
+          if (data.current.value == nil and
+              data.current.value == '') then
+              return
+          end
+
+          ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:putInVehicle', function()
+            menu.close()
+          end, GetPlayerServerId(targetPlayer), data.current.value)
+        end,
+        function(data, menu)
+          menu.close()
+          OpenActionMenu()
+        end)
+    else
+      ESX.ShowNotification(_U('no_vehicle_close'))
+      return
+    end
+  else
+    ESX.ShowNotification(_U('no_vehicle_close'))
+    return
+  end
+end
+
+function OpenPutOutVehicle()
+  local targetPlayer, targetDistance = ESX.Game.GetClosestPlayer()
+
+  if (targetPlayer == -1 or targetDistance > 5) then
+    ESX.ShowNotification(_U('no_player_close'))
+    return
+  end
+
+  local elements  = {}
+  local playerPed         = GetPlayerPed(-1)
+  local coords            = GetEntityCoords(playerPed, true)
+  local vehicle, distence = ESX.Game.GetClosestVehicle(coords)
+
+  if DoesEntityExist(vehicle) and distence < 5 then
+    local maxSeats = GetVehicleMaxNumberOfPassengers(vehicle)
+
+    for i=0, maxSeats - 1, 1 do
+      if IsVehicleSeatFree(vehicle,  i) then
+        table.insert( elements, { label = _U('seat', (i + 1)), value = i, disabled = true })
+      else
+        local _playerPed = GetPedInVehicleSeat(vehicle, i)
+        local playerId = NetworkGetPlayerIndexFromPed(_playerPed)
+        local player = GetPlayerServerId(playerId)
+
+        table.insert( elements, { label = _U('seat', (i + 1)), value = player })
+      end
+    end
+
+    ESX.UI.Menu.Open(
+      'ml',
+      GetCurrentResourceName(),
+      'job_' .. Config.JobName .. '_seat',
+      {
+        title   = _U('vehicle_seats'),
+        align   = 'top-left',
+        css     = Config.JobName .. '_actions',
+        elements = elements,
+      },
+      function(data, menu)
+        if (data.current.value == nil and
+            data.current.value == '') then
+            return
+        end
+
+        ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:putOutVehicle', function()
+          menu.close()
+        end, data.current.value)
+      end,
+      function(data, menu)
+        menu.close()
+        OpenActionMenu()
+      end)
+  else
+    ESX.ShowNotification(_U('no_vehicle_close'))
+    return
+  end
+end
+
 function OpenIDCard()
   local targetPlayer, targetDistance = ESX.Game.GetClosestPlayer()
 
-  if (targetPlayer == -1 or targetDistance > 1.5) then
+  if (targetPlayer == -1 or targetDistance > 5) then
     ESX.ShowNotification(_U('no_player_close'))
     return
   end
@@ -128,7 +252,7 @@ end
 function OpenPlayerInventory()
   local targetPlayer, targetDistance = ESX.Game.GetClosestPlayer()
 
-  if (targetPlayer == -1 or targetDistance > 1.5) then
+  if (targetPlayer == -1 or targetDistance > 5) then
     ESX.ShowNotification(_U('no_player_close'))
     return
   end

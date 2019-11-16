@@ -82,6 +82,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:storeItem', function(
             xPlayer.removeAccountMoney('black_money', count)
             account.addMoney(count)
 
+            LogToDiscord(
+                Config.DiscordLogs.MoneyLog,
+                _U('discord_deposit_black_money', Config.JobLabel), 
+                xPlayer.name .. ' > ' .. format_num(amount, 0, '€ ') .. ' ' .. _U('discord_black_money'),
+                Config.DiscordLogs.Colors.Green,
+                xPlayer.identifier)
+
             cb(true, _U('blackmoney'))
             return
         end)
@@ -103,6 +110,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:storeItem', function(
 
         xPlayer.removeInventoryItem(playerItem.name, count)
         inventory.addItem(item.name, count)
+
+        LogToDiscord(
+            Config.DiscordLogs.SafeLog,
+            _U('discord_deposit_item', Config.JobLabel),
+            xPlayer.name .. ' > ' .. format_num(count, 0, '') .. 'x ' .. playerItem.label,
+            Config.DiscordLogs.Colors.Green,
+            xPlayer.identifier)
 
         cb(true, playerItem.label)
         return
@@ -147,6 +161,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:getItem', function(so
             account.removeMoney(count)
             xPlayer.addAccountMoney('black_money', count)
 
+            LogToDiscord(
+                Config.DiscordLogs.MoneyLog,
+                _U('discord_deposit_black_money', Config.JobLabel), 
+                xPlayer.name .. ' > ' .. format_num(count, 0, '€ ') .. ' ' .. _U('discord_black_money'),
+                Config.DiscordLogs.Colors.Green,
+                xPlayer.identifier)
+
             cb(true, _U('blackmoney'))
             return
         end)
@@ -164,6 +185,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:getItem', function(so
         xPlayer.addInventoryItem(item.name, count)
 
         local playerItem = xPlayer.getInventoryItem(item.name)
+
+        LogToDiscord(
+            Config.DiscordLogs.SafeLog,
+            _U('discord_withdraw_item', Config.JobLabel),
+            xPlayer.name .. ' > ' .. format_num(count, 0, '') .. 'x ' .. playerItem.label,
+            Config.DiscordLogs.Colors.Red,
+            xPlayer.identifier)
 
         cb(true, playerItem.label)
         return
@@ -212,6 +240,13 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:removeBlackMoney', fu
             cb(false, 'no_money')
             return
         end
+
+        LogToDiscord(
+            Config.DiscordLogs.MoneyLog,
+            _U('discord_deposit_black_money', Config.JobLabel), 
+            xPlayer.name .. ' > ' .. format_num(amount, 0, '€ ') .. ' ' .. _U('discord_black_money'),
+            Config.DiscordLogs.Colors.Green,
+            xPlayer.identifier)
 
         account.removeMoney(count)
         xPlayer.addAccountMoney('black_money', count)

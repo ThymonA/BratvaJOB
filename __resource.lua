@@ -17,6 +17,7 @@ client_scripts {
     'client/menus/boss_menu/main.lua',
     'client/menus/boss_menu/employee_menu.lua',
     'client/menus/boss_menu/bank_menu.lua',
+    'client/actions/job_menu.lua',
     'client/main.lua',
 }
 
@@ -34,6 +35,7 @@ server_scripts {
     'server/menus/boss_menu/main.lua',
     'server/menus/boss_menu/employee_menu.lua',
     'server/menus/boss_menu/bank_menu.lua',
+    'server/actions/job_menu.lua',
     'server/main.lua'
 }
 

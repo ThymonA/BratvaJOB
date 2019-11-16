@@ -13,9 +13,12 @@ local Keys = {
 local PlayerData                = {}
 local CurrentAction             = nil
 local LastAction                = nil
-local ActionData                = nil
 local Blips                     = {}
 local BlipsUpdated              = false
+local IsHandcuffed              = false
+local DraggedBy = -1
+local Drag = false
+local WasDragged = false
 local Action                    = {
     SpawnVehicle    = 'SpawnVehicle',
     ParkInGarage    = 'ParkInGarage',
@@ -241,8 +244,22 @@ Citizen.CreateThread(function()
             end
 		else
 			Citizen.Wait(0)
-		end
+        end
 	end
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(0)
+
+        if (IsControlPressed(0, Keys['F6']) and JobIsPrimaryJob()) then
+            OpenActionMenu()
+        end
+
+        if (IsControlPressed(0, Keys['F5']) and JobIsSecondaryJob()) then
+            OpenActionMenu()
+        end
+    end
 end)
 
 -- Update Blips when first loaded
@@ -252,6 +269,34 @@ Citizen.CreateThread(function()
     while not BlipsUpdated do
         if (ESX ~= nil and PlayerData ~= nil) then
             TriggerEvent('ml_' .. Config.JobName .. 'job:updateBlip')
+        end
+    end
+end)
+
+Citizen.CreateThread(function()
+	while true do
+		Citizen.Wait(0)
+
+        DisableControls(IsHandcuffed)
+
+        if IsHandcuffed and not IsEntityPlayingAnim(GetPlayerPed(PlayerId()), "mp_arresting", "idle", 3) then
+            Citizen.Wait(100)
+            TaskPlayAnim(GetPlayerPed(PlayerId()), "mp_arresting", "idle", 8.0, -8, -1, 49, 0, 0, 0, 0)
+		end
+	end
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(0)
+        if Drag then
+            WasDragged = true
+            AttachEntityToEntity(PlayerPedId(-1), GetPlayerPed(GetPlayerFromServerId(DraggedBy)), 11816, 0.35, 0.35, 0.0, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
+        else
+            if not IsPedInParachuteFreeFall(PlayerPedId(-1)) and WasDragged then
+                WasDragged = false
+                DetachEntity(PlayerPedId(-1), true, false)
+            end
         end
     end
 end)
@@ -292,7 +337,6 @@ AddEventHandler('ml_' .. Config.JobName .. 'job:hasExitedMarker', function()
 	ESX.UI.Menu.CloseAll()
     CurrentAction = nil
     LastAction = nil
-    ActionData = nil
 end)
 
 RegisterNetEvent('ml_' .. Config.JobName .. 'job:updateBlip')
@@ -320,6 +364,74 @@ AddEventHandler('ml_' .. Config.JobName .. 'job:updateBlip', function()
 
     BlipsUpdated = true
 end)
+
+RegisterNetEvent('ml_' .. Config.JobName .. 'job:handcuff')
+AddEventHandler('ml_' .. Config.JobName .. 'job:handcuff', function()
+    local playerPed = GetPlayerPed(-1)
+
+    if (DoesEntityExist(playerPed)) then
+        if (IsHandcuffed) then
+                ClearPedSecondaryTask(playerPed)
+                SetEnableHandcuffs(playerPed, false)
+                SetCurrentPedWeapon(playerPed, GetHashKey("WEAPON_UNARMED"), true)
+                SetPedCanPlayGestureAnims(playerPed, true)
+                IsHandcuffed = false
+        else
+            if IsEntityPlayingAnim(playerPed, "mp_arresting", "idle", 3) then
+                ClearPedSecondaryTask(playerPed)
+                SetEnableHandcuffs(playerPed, false)
+                SetCurrentPedWeapon(playerPed, GetHashKey("WEAPON_UNARMED"), true)
+                SetPedCanPlayGestureAnims(playerPed, false)
+                IsHandcuffed = false
+            else
+                RequestAnimDict("mp_arresting")
+                while not HasAnimDictLoaded("mp_arresting") do
+                    Citizen.Wait(100)
+                end
+
+                TaskPlayAnim(playerPed, "mp_arresting", "idle", 8.0, -8, -1, 49, 0, 0, 0, 0)
+                SetEnableHandcuffs(playerPed, true)
+                SetCurrentPedWeapon(playerPed, GetHashKey("WEAPON_UNARMED"), true)
+                IsHandcuffed = true
+            end
+        end
+    end
+end)
+
+RegisterNetEvent('ml_' .. Config.JobName .. 'job:drag')
+AddEventHandler('ml_' .. Config.JobName .. 'job:drag', function(dragger)
+    DraggedBy = dragger
+    Drag = not Drag
+end)
+
+function DisableControls(status)
+    if (status) then
+        ClearPedSecondaryTask(playerPed)
+        SetEnableHandcuffs(playerPed, false)
+        SetCurrentPedWeapon(playerPed, GetHashKey("WEAPON_UNARMED"), true)
+        SetPedCanPlayGestureAnims(playerPed, true)
+
+        SetPedPathCanUseLadders(playerPed, false)
+
+        if IsPedInAnyVehicle(playerPed, false) then
+            DisableControlAction(0, 59, true)
+        end
+
+        DisableControlAction(0, 142, status)
+        DisableControlAction(0, 30,  status)
+        DisableControlAction(0, 31,  status)
+        DisableControlAction(0, 170, status)
+        DisableControlAction(0, 167, status)
+        DisableControlAction(0, 5, status)
+        DisableControlAction(0, 6, status)
+        DisableControlAction(0, 45, status)
+        DisableControlAction(0, 142, status)
+        DisableControlAction(0, 141, status)
+        DisableControlAction(0, 140, status)
+        DisableControlAction(0, 263, status)
+        DisableControlAction(0, 264, status)
+    end
+end
 
 function CreateJobBlip(playerId)
     local currentPlayer = PlayerPedId(-1)
@@ -356,6 +468,15 @@ function PlayerContainsJob()
     return (PlayerData.job ~= nil and string.lower(PlayerData.job.name) == string.lower(Config.JobName)) or
         (PlayerData.job2 ~= nil and string.lower(PlayerData.job2.name) == string.lower(Config.JobName))
 end
+
+function JobIsPrimaryJob()
+    return (PlayerData.job ~= nil and string.lower(PlayerData.job.name) == string.lower(Config.JobName))
+end
+
+function JobIsSecondaryJob()
+    return (PlayerData.job2 ~= nil and string.lower(PlayerData.job2.name) == string.lower(Config.JobName))
+end
+
 
 function IsCurrentAction(action)
     return CurrentAction ~= nil and string.lower(CurrentAction) == string.lower(action)
@@ -396,6 +517,13 @@ function HasGrade(grade)
 
     return string.lower(grade) == playerGrade
 end
+
+function LoadAnimDict(dict)
+    while (not HasAnimDictLoaded(dict)) do
+        RequestAnimDict(dict)
+        Citizen.Wait(5)
+    end
+end 
 
 RegisterNetEvent('mlx:setJob')
 AddEventHandler('mlx:setJob', function(job)

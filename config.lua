@@ -90,25 +90,49 @@ Config.Outfits = {
     {
         name = 'Bratva',
         clothes = {
-            ['tshirt_1'] = 96,
-            ['tshirt_2'] = 2,
-            ['torso_1'] = 29,
-            ['torso_2'] = 0,
-            ['decals_1'] = 0,
-            ['decals_2'] = 0,
-            ['arms'] = 33,
-            ['pants_1'] = 52,
-            ['pants_2'] = 2,
-            ['shoes_1'] = 10,
-            ['shoes_2'] = 0,
-            ['helmet_1'] = -1,
-            ['helmet_2'] = 0,
-            ['chain_1'] = 22,
-            ['chain_2'] = 9,
-            ['ears_1'] = -1,
-            ['mask_1'] = 121,
-            ['mask_2'] = 0,
+            ['tshirt_1'] = 96,  ['tshirt_2'] = 2,   ['torso_1'] = 29,
+            ['torso_2'] = 0,    ['decals_1'] = 0,   ['decals_2'] = 0,
+            ['arms'] = 33,      ['pants_1'] = 52,   ['pants_2'] = 2,
+            ['shoes_1'] = 10,   ['shoes_2'] = 0,    ['helmet_1'] = -1,
+            ['helmet_2'] = 0,   ['chain_1'] = 22,   ['chain_2'] = 9,
+            ['ears_1'] = -1,    ['mask_1'] = 121,   ['mask_2'] = 0,
         },
-        grades = {}
+        grades = { 'boss' }
+    },
+    {
+        name = 'Bratva',
+        clothes = {
+            ['tshirt_1'] = 96,  ['tshirt_2'] = 2,   ['torso_1'] = 29,
+            ['torso_2'] = 0,    ['decals_1'] = 0,   ['decals_2'] = 0,
+            ['arms'] = 33,      ['pants_1'] = 52,   ['pants_2'] = 2,
+            ['shoes_1'] = 10,   ['shoes_2'] = 0,    ['helmet_1'] = -1,
+            ['helmet_2'] = 0,   ['chain_1'] = 22,   ['chain_2'] = 9,
+            ['ears_1'] = -1,    ['mask_1'] = 121,   ['mask_2'] = 0,
+        },
+        grades = { 'sovietnik' }
+    },
+    {
+        name = 'Bratva',
+        clothes = {
+            ['tshirt_1'] = 96,  ['tshirt_2'] = 2,   ['torso_1'] = 29,
+            ['torso_2'] = 0,    ['decals_1'] = 0,   ['decals_2'] = 0,
+            ['arms'] = 33,      ['pants_1'] = 52,   ['pants_2'] = 2,
+            ['shoes_1'] = 10,   ['shoes_2'] = 0,    ['helmet_1'] = -1,
+            ['helmet_2'] = 0,   ['chain_1'] = 22,   ['chain_2'] = 9,
+            ['ears_1'] = -1,    ['mask_1'] = 121,   ['mask_2'] = 0,
+        },
+        grades = { 'obshchak' }
+    },
+    {
+        name = 'Bratva',
+        clothes = {
+            ['tshirt_1'] = 96,  ['tshirt_2'] = 2,   ['torso_1'] = 29,
+            ['torso_2'] = 0,    ['decals_1'] = 0,   ['decals_2'] = 0,
+            ['arms'] = 33,      ['pants_1'] = 52,   ['pants_2'] = 2,
+            ['shoes_1'] = 10,   ['shoes_2'] = 0,    ['helmet_1'] = -1,
+            ['helmet_2'] = 0,   ['chain_1'] = 22,   ['chain_2'] = 9,
+            ['ears_1'] = -1,    ['mask_1'] = 121,   ['mask_2'] = 0,
+        },
+        grades = { 'restap' }
     }
 }

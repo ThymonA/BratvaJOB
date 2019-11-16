@@ -133,24 +133,6 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:loadGrades', function
     end)
 end)
 
-ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:sendNotification', function(source, cb, idenfier, message)
-    local xTarget = ESX.GetPlayerFromIdentifier(idenfier)
-
-    if (xTarget == nil) then
-        if (cb ~= nil) then
-            cb()
-        end
-
-        return
-    end
-
-    TriggerClientEvent('mlx:showNotification', xTarget.source, message)
-
-    if (cb ~= nil) then
-        cb()
-    end
-end)
-
 ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:setJob', function(source, cb, identifier, job, grade)
     MySQL.Async.execute('UPDATE `users` SET `job` = @job, `job_grade` = @job_grade WHERE `identifier` = @identifier',
     {

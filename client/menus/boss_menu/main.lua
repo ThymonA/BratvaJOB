@@ -35,6 +35,8 @@ function OpenBossMenu()
         function(data, menu)
             if (data.current.value == 'employee_menu') then
                 OpenEmployeeMenu()
+            elseif (data.current.value == 'bank_menu') then
+                OpenBankMenu()
             end
         end,
         function(data, menu)

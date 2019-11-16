@@ -19,58 +19,44 @@ function OpenActionMenu()
   ESX.UI.Menu.CloseAll()
 
   ESX.UI.Menu.Open(
-      'ml',
-      GetCurrentResourceName(),
-      'job_' .. Config.JobName .. '_actions',
-      {
-        title   = _U('actions'),
-        align   = 'top-left',
-        css     = Config.JobName .. '_actions',
-        elements = {
-          { label = _U('personal_actions'), value = 'personal_actions' },
-          { label = _U('vehicle_actions'), value = 'vehicle_actions' }
-        }
-      },
-      function(data, menu)
-        if (data.current.value == 'personal_actions') then
-          OpenPersonalActions()
-        end
-      end,
-      function(data, menu)
-          menu.close()
-      end)
-end
+    'ml',
+    GetCurrentResourceName(),
+    'job_' .. Config.JobName .. '_actions',
+    {
+      title   = _U('actions'),
+      align   = 'top-left',
+      css     = Config.JobName .. '_actions',
+      elements = {
+        { label = _U('person'), value = '', disabled = true },
+        { label = _U('handcuff'), value = 'handcuff' },
+        { label = _U('drag'), value = 'drag' },
+        { label = _U('id_card'), value = 'id_card' },
+        { label = _U('player_search'), value = 'player_search' },
+        { label = _U('vehicle'), value = '', disabled = true },
+        { label = _U('hijack_vehicle'), value = 'hijack_vehicle' },
+      }
+    },
+    function(data, menu)
+      if (data.current.value == nil or
+          data.current.value == '') then
+          return
+      end
 
-function OpenPersonalActions()
-  ESX.UI.Menu.Open(
-        'ml',
-        GetCurrentResourceName(),
-        'job_' .. Config.JobName .. '_personal_actions',
-        {
-          title   = _U('personal_actions'),
-          align   = 'top-left',
-          css     = Config.JobName .. '_actions',
-          elements = {
-            { label = _U('handcuff'), value = 'handcuff' },
-            { label = _U('drag'), value = 'drag' },
-            { label = _U('id_card'), value = 'id_card' },
-            { label = _U('player_search'), value = 'player_search' }
-          }
-        },
-        function(data, menu)
-          if (data.current.value == 'handcuff') then
-            HandcuffPlayer()
-          elseif (data.current.value == 'drag') then
-            DragPlayer()
-          elseif (data.current.value == 'id_card') then
-            OpenIDCard()
-          elseif (data.current.value == 'player_search') then
-            OpenPlayerInventory()
-          end
-        end,
-        function(data, menu)
-            menu.close()
-        end)
+      if (data.current.value == 'handcuff') then
+        HandcuffPlayer()
+      elseif (data.current.value == 'drag') then
+        DragPlayer()
+      elseif (data.current.value == 'id_card') then
+        OpenIDCard()
+      elseif (data.current.value == 'player_search') then
+        OpenPlayerInventory()
+      elseif (data.current.value == 'hijack_vehicle') then
+        HijackVehicle()
+      end
+    end,
+    function(data, menu)
+        menu.close()
+    end)
 end
 
 function HandcuffPlayer()
@@ -206,6 +192,33 @@ function TargetPlayerInventory(targetPlayer)
         menu.close()
       end)
   end, GetPlayerServerId(targetPlayer))
+end
+
+function HijackVehicle()
+  local playerPed = GetPlayerPed(-1)
+  local coords    = GetEntityCoords(playerPed)
+
+  if IsAnyVehicleNearPoint(coords.x, coords.y, coords.z, 3.0) then
+    local vehicle = GetClosestVehicle(coords.x,  coords.y,  coords.z,  3.0,  0,  71)
+
+    if DoesEntityExist(vehicle) then
+      Citizen.CreateThread(function()
+        TaskStartScenarioInPlace(playerPed, "WORLD_HUMAN_WELDING", 0, true)
+
+        Wait(8000)
+
+        ClearPedTasksImmediately(playerPed)
+
+        SetVehicleDoorsLocked(vehicle, 1)
+        SetVehicleDoorsLockedForAllPlayers(vehicle, false)
+        PlayVehicleDoorOpenSound(vehicle, 0)
+
+        ESX.ShowNotification(_U('vehicle_is_open'))
+      end)
+    else
+      ESX.ShowNotification(_U('no_vehicle_close'))
+    end
+  end
 end
 
 RegisterNetEvent('mlx:setJob')

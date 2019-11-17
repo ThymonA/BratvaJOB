@@ -107,8 +107,12 @@ function OpenPutInVehicle()
     if DoesEntityExist(vehicle) then
       local maxSeats = GetVehicleMaxNumberOfPassengers(vehicle)
 
-      for i=0, maxSeats - 1, 1 do
-        if IsVehicleSeatFree(vehicle,  i) then
+      for i=0, maxSeats, 1 do
+        if (maxSeats == i and not IsVehicleSeatFree(vehicle,  -1)) then
+          table.insert( elements, { label = _U('seat_head'), value = -1, disabled = true })
+        elseif (maxSeats == i and IsVehicleSeatFree(vehicle,  -1)) then
+          table.insert( elements, { label = _U('seat_head'), value = -1  })
+        elseif IsVehicleSeatFree(vehicle,  i) then
           table.insert( elements, { label = _U('seat', (i + 1)), value = i })
         else
           table.insert( elements, { label = _U('seat', (i + 1)), value = i, disabled = true })
@@ -165,8 +169,16 @@ function OpenPutOutVehicle()
   if DoesEntityExist(vehicle) and distence < 5 then
     local maxSeats = GetVehicleMaxNumberOfPassengers(vehicle)
 
-    for i=0, maxSeats - 1, 1 do
-      if IsVehicleSeatFree(vehicle,  i) then
+    for i=0, maxSeats, 1 do
+      if (maxSeats == i and not IsVehicleSeatFree(vehicle,  -1)) then
+        local _playerPed = GetPedInVehicleSeat(vehicle, -1)
+        local playerId = NetworkGetPlayerIndexFromPed(_playerPed)
+        local player = GetPlayerServerId(playerId)
+
+        table.insert( elements, { label = _U('seat_head'), value = player })
+      elseif (maxSeats == i and IsVehicleSeatFree(vehicle,  -1)) then
+        table.insert( elements, { label = _U('seat_head'), value = -1, disabled = true  })
+      elseif IsVehicleSeatFree(vehicle,  i) then
         table.insert( elements, { label = _U('seat', (i + 1)), value = i, disabled = true })
       else
         local _playerPed = GetPedInVehicleSeat(vehicle, i)

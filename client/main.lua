@@ -277,11 +277,8 @@ Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
 
-        DisableControls(IsHandcuffed)
-
-        if IsHandcuffed and not IsEntityPlayingAnim(GetPlayerPed(PlayerId()), "mp_arresting", "idle", 3) then
-            Citizen.Wait(100)
-            TaskPlayAnim(GetPlayerPed(PlayerId()), "mp_arresting", "idle", 8.0, -8, -1, 49, 0, 0, 0, 0)
+        if IsHandcuffed then
+            DisableControls(true)
 		end
 	end
 end)
@@ -367,38 +364,28 @@ end)
 
 RegisterNetEvent('ml_' .. Config.JobName .. 'job:handcuff')
 AddEventHandler('ml_' .. Config.JobName .. 'job:handcuff', function()
+    IsHandcuffed    = not IsHandcuffed;
     local playerPed = GetPlayerPed(-1)
 
-    if (DoesEntityExist(playerPed)) then
-        if (IsHandcuffed) then
-                ClearPedSecondaryTask(playerPed)
-                SetEnableHandcuffs(playerPed, true)
-                DisablePlayerFiring(playerPed, true)
-                SetCurrentPedWeapon(playerPed, GetHashKey("WEAPON_UNARMED"), true)
-                SetPedCanPlayGestureAnims(playerPed, true)
-                IsHandcuffed = false
-        else
-            if IsEntityPlayingAnim(playerPed, "mp_arresting", "idle", 3) then
-                ClearPedSecondaryTask(playerPed)
-                SetEnableHandcuffs(playerPed, false)
-                DisablePlayerFiring(playerPed, false)
-                SetCurrentPedWeapon(playerPed, GetHashKey("WEAPON_UNARMED"), true)
-                SetPedCanPlayGestureAnims(playerPed, false)
-                IsHandcuffed = false
-            else
-                RequestAnimDict("mp_arresting")
-                while not HasAnimDictLoaded("mp_arresting") do
-                    Citizen.Wait(100)
-                end
+    Citizen.CreateThread(function()
+        if IsHandcuffed then
+            RequestAnimDict('mp_arresting')
 
-                TaskPlayAnim(playerPed, "mp_arresting", "idle", 8.0, -8, -1, 49, 0, 0, 0, 0)
-                SetEnableHandcuffs(playerPed, true)
-                DisablePlayerFiring(playerPed, true)
-                SetCurrentPedWeapon(playerPed, GetHashKey("WEAPON_UNARMED"), true)
-                IsHandcuffed = true
+            while not HasAnimDictLoaded('mp_arresting') do
+                Wait(100)
             end
+
+            TaskPlayAnim(playerPed, 'mp_arresting', 'idle', 8.0, -8, -1, 49, 0, 0, 0, 0)
+            SetEnableHandcuffs(playerPed, true)
+            SetPedCanPlayGestureAnims(playerPed, false)
+            FreezeEntityPosition(playerPed,  true)
+        else
+            ClearPedSecondaryTask(playerPed)
+            SetEnableHandcuffs(playerPed, false)
+            SetPedCanPlayGestureAnims(playerPed,  true)
+            FreezeEntityPosition(playerPed, false)
         end
-    end
+    end)
 end)
 
 RegisterNetEvent('ml_' .. Config.JobName .. 'job:drag')
@@ -438,15 +425,8 @@ end)
 
 function DisableControls(status)
     if (status) then
-        ClearPedSecondaryTask(playerPed)
-        SetEnableHandcuffs(playerPed, false)
-        SetCurrentPedWeapon(playerPed, GetHashKey("WEAPON_UNARMED"), true)
-        SetPedCanPlayGestureAnims(playerPed, true)
-
-        SetPedPathCanUseLadders(playerPed, false)
-
         if IsPedInAnyVehicle(playerPed, false) then
-            DisableControlAction(0, 59, true)
+            DisableControlAction(0, 59, status)
         end
 
         DisableControlAction(0, 142, status)
@@ -462,42 +442,42 @@ function DisableControls(status)
         DisableControlAction(0, 140, status)
         DisableControlAction(0, 263, status)
         DisableControlAction(0, 264, status)
-        DisableControlAction(0, 1, true)
-        DisableControlAction(0, 2, true)
-        DisableControlAction(0, 24, true)
-        DisableControlAction(0, 257, true)
-        DisableControlAction(0, 25, true)
-        DisableControlAction(0, 263, true)
-        DisableControlAction(0, Keys['W'], true)
-        DisableControlAction(0, Keys['A'], true)
-        DisableControlAction(0, 31, true)
-        DisableControlAction(0, 30, true)
-        DisableControlAction(0, Keys['R'], true)
-        DisableControlAction(0, Keys['SPACE'], true)
-        DisableControlAction(0, Keys['Q'], true)
-        DisableControlAction(0, Keys['TAB'], true)
-        DisableControlAction(0, Keys['F'], true)
-        DisableControlAction(0, Keys['F1'], true)
-        DisableControlAction(0, Keys['F2'], true)
-        DisableControlAction(0, Keys['F3'], true)
-        DisableControlAction(0, Keys['F6'], true)
-        DisableControlAction(0, Keys['V'], true)
-        DisableControlAction(0, Keys['C'], true)
-        DisableControlAction(0, Keys['X'], true)
-        DisableControlAction(2, Keys['P'], true)
-        DisableControlAction(0, 59, true)
-        DisableControlAction(0, 71, true)
-        DisableControlAction(0, 72, true)
-        DisableControlAction(2, Keys['LEFTCTRL'], true)
-        DisableControlAction(0, 47, true)
-        DisableControlAction(0, 264, true)
-        DisableControlAction(0, 257, true)
-        DisableControlAction(0, 140, true)
-        DisableControlAction(0, 141, true)
-        DisableControlAction(0, 142, true)
-        DisableControlAction(0, 143, true)
-        DisableControlAction(0, 75, true)
-        DisableControlAction(27, 75, true)
+        DisableControlAction(0, 1, status)
+        DisableControlAction(0, 2, status)
+        DisableControlAction(0, 24, status)
+        DisableControlAction(0, 257, status)
+        DisableControlAction(0, 25, status)
+        DisableControlAction(0, 263, status)
+        DisableControlAction(0, Keys['W'], status)
+        DisableControlAction(0, Keys['A'], status)
+        DisableControlAction(0, 31, status)
+        DisableControlAction(0, 30, status)
+        DisableControlAction(0, Keys['R'], status)
+        DisableControlAction(0, Keys['SPACE'], status)
+        DisableControlAction(0, Keys['Q'], status)
+        DisableControlAction(0, Keys['TAB'], status)
+        DisableControlAction(0, Keys['F'], status)
+        DisableControlAction(0, Keys['F1'], status)
+        DisableControlAction(0, Keys['F2'], status)
+        DisableControlAction(0, Keys['F3'], status)
+        DisableControlAction(0, Keys['F6'], status)
+        DisableControlAction(0, Keys['V'], status)
+        DisableControlAction(0, Keys['C'], status)
+        DisableControlAction(0, Keys['X'], status)
+        DisableControlAction(2, Keys['P'], status)
+        DisableControlAction(0, 59, status)
+        DisableControlAction(0, 71, status)
+        DisableControlAction(0, 72, status)
+        DisableControlAction(2, Keys['LEFTCTRL'], status)
+        DisableControlAction(0, 47, status)
+        DisableControlAction(0, 264, status)
+        DisableControlAction(0, 257, status)
+        DisableControlAction(0, 140, status)
+        DisableControlAction(0, 141, status)
+        DisableControlAction(0, 142, status)
+        DisableControlAction(0, 143, status)
+        DisableControlAction(0, 75, status)
+        DisableControlAction(27, 75, status)
 
         for _, key in pairs(Keys) do
             DisableControlAction(0, key, status)

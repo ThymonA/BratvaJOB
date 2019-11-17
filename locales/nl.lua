@@ -181,4 +181,5 @@ Locales['nl'] = {
     ['discord_drag'] = '%s heeft een speler meegenomen',
     ['discord_vehicle'] = '%s heeft een speler in een auto gestopt',
     ['discord_out_vehicle'] = '%s heeft een speler uit een auto gehaald',
+    ['seat_head'] = 'Bestuurder'
 }

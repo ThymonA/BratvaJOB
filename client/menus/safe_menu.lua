@@ -83,7 +83,8 @@ function OpenAddItemMenu()
                     'safe_menu_add_amount',
                     {
                         title = _U('item_count'),
-                        submit = _U('save')
+                        submit = _U('save'),
+                        css = Config.JobName
                     },
                     function(data2, menu2)
                         ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:storeItem', function(done, msg)
@@ -154,7 +155,8 @@ function OpenRemoveItemMenu()
                     'safe_menu_remove_amount',
                     {
                         title = _U('item_count'),
-                        submit = _U('get')
+                        submit = _U('get'),
+                        css = Config.JobName
                     },
                     function(data2, menu2)
                         ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:getItem', function(done, msg)

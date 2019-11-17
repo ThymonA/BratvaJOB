@@ -55,7 +55,8 @@ function GetMoneyMenu()
         'withdraw_money',
         {
             title = _U('withdraw_money'),
-            submit = _U('withdraw')
+            submit = _U('withdraw'),
+            css = Config.JobName
         },
         function(data, menu)
             if (data.value == nil or
@@ -86,7 +87,8 @@ function PutMoneyMenu()
         'put_money',
         {
             title = _U('put_money'),
-            submit = _U('deposit')
+            submit = _U('deposit'),
+            css = Config.JobName
         },
         function(data, menu)
             if (data.value == nil or
@@ -117,7 +119,8 @@ function GetBlackMoneyMenu()
         'withdraw_black_money',
         {
             title = _U('get_black_money'),
-            submit = _U('withdraw')
+            submit = _U('withdraw'),
+            css = Config.JobName
         },
         function(data, menu)
             if (data.value == nil or

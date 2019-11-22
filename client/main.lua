@@ -41,7 +41,12 @@ Citizen.CreateThread(function()
 		Citizen.Wait(10)
 	end
 
-	PlayerData = ESX.GetPlayerData()
+    PlayerData = ESX.GetPlayerData()
+
+    if (PlayerContainsJob()) then
+        ESX.TriggerServerCallback('ml_' .. Config.JobName .. 'job:updateBlips', function()
+        end)
+    end
 end)
 
 -- Draw markers
@@ -50,7 +55,7 @@ Citizen.CreateThread(function()
         if (PlayerContainsJob()) then
             local playerPed = GetPlayerPed(-1)
             local coords = GetEntityCoords(playerPed)
-          
+
             -- Markers
             local marker = Config.Marker
             local defaultMarker = marker.Default
@@ -275,10 +280,59 @@ end)
 
 Citizen.CreateThread(function()
 	while true do
-		Citizen.Wait(0)
+		Citizen.Wait(1)
+		local playerPed = PlayerPedId()
 
-        if IsHandcuffed then
-            DisableControls(true)
+		if IsHandcuffed then
+			DisableControlAction(0, 1, true) -- Disable pan
+			DisableControlAction(0, 2, true) -- Disable tilt
+			DisableControlAction(0, 24, true) -- Attack
+			DisableControlAction(0, 257, true) -- Attack 2
+			DisableControlAction(0, 25, true) -- Aim
+			DisableControlAction(0, 263, true) -- Melee Attack 1
+			DisableControlAction(0, Keys['W'], true) -- W
+			DisableControlAction(0, Keys['A'], true) -- A
+			DisableControlAction(0, 31, true) -- S (fault in Keys table!)
+			DisableControlAction(0, 30, true) -- D (fault in Keys table!)
+
+			DisableControlAction(0, Keys['R'], true) -- Reload
+			DisableControlAction(0, Keys['SPACE'], true) -- Jump
+			DisableControlAction(0, Keys['Q'], true) -- Cover
+			DisableControlAction(0, Keys['TAB'], true) -- Select Weapon
+			DisableControlAction(0, Keys['F'], true) -- Also 'enter'?
+
+			DisableControlAction(0, Keys['F1'], true) -- Disable phone
+			DisableControlAction(0, Keys['F2'], true) -- Inventory
+			DisableControlAction(0, Keys['F3'], true) -- Animations
+			DisableControlAction(0, Keys['F6'], true) -- Job
+
+			DisableControlAction(0, Keys['V'], true) -- Disable changing view
+			DisableControlAction(0, Keys['C'], true) -- Disable looking behind
+			DisableControlAction(0, Keys['X'], true) -- Disable clearing animation
+			DisableControlAction(2, Keys['P'], true) -- Disable pause screen
+
+			DisableControlAction(0, 59, true) -- Disable steering in vehicle
+			DisableControlAction(0, 71, true) -- Disable driving forward in vehicle
+			DisableControlAction(0, 72, true) -- Disable reversing in vehicle
+
+			DisableControlAction(2, Keys['LEFTCTRL'], true) -- Disable going stealth
+
+			DisableControlAction(0, 47, true)  -- Disable weapon
+			DisableControlAction(0, 264, true) -- Disable melee
+			DisableControlAction(0, 257, true) -- Disable melee
+			DisableControlAction(0, 140, true) -- Disable melee
+			DisableControlAction(0, 141, true) -- Disable melee
+			DisableControlAction(0, 142, true) -- Disable melee
+			DisableControlAction(0, 143, true) -- Disable melee
+			DisableControlAction(0, 75, true)  -- Disable exit vehicle
+			DisableControlAction(27, 75, true) -- Disable exit vehicle
+			if IsEntityPlayingAnim(playerPed, 'mp_arresting', 'idle', 3) ~= 1 then
+				ESX.Streaming.RequestAnimDict('mp_arresting', function()
+					TaskPlayAnim(playerPed, 'mp_arresting', 'idle', 8.0, -8, -1, 49, 0, 0, 0, 0)
+				end)
+			end
+		else
+			Citizen.Wait(500)
 		end
 	end
 end)
@@ -364,28 +418,49 @@ end)
 
 RegisterNetEvent('ml_' .. Config.JobName .. 'job:handcuff')
 AddEventHandler('ml_' .. Config.JobName .. 'job:handcuff', function()
-    IsHandcuffed    = not IsHandcuffed;
-    local playerPed = GetPlayerPed(-1)
+    IsHandcuffed    = not IsHandcuffed
+	local playerPed = PlayerPedId()
 
-    Citizen.CreateThread(function()
-        if IsHandcuffed then
-            RequestAnimDict('mp_arresting')
+	Citizen.CreateThread(function()
+		if IsHandcuffed then
 
-            while not HasAnimDictLoaded('mp_arresting') do
-                Wait(100)
-            end
+			RequestAnimDict('mp_arresting')
+			while not HasAnimDictLoaded('mp_arresting') do
+				Citizen.Wait(100)
+			end
 
-            TaskPlayAnim(playerPed, 'mp_arresting', 'idle', 8.0, -8, -1, 49, 0, 0, 0, 0)
-            SetEnableHandcuffs(playerPed, true)
-            SetPedCanPlayGestureAnims(playerPed, false)
-            FreezeEntityPosition(playerPed,  true)
-        else
-            ClearPedSecondaryTask(playerPed)
-            SetEnableHandcuffs(playerPed, false)
-            SetPedCanPlayGestureAnims(playerPed,  true)
-            FreezeEntityPosition(playerPed, false)
-        end
-    end)
+			TaskPlayAnim(playerPed, 'mp_arresting', 'idle', 8.0, -8, -1, 49, 0, 0, 0, 0)
+
+			SetEnableHandcuffs(playerPed, true)
+			DisablePlayerFiring(playerPed, true)
+			SetCurrentPedWeapon(playerPed, GetHashKey('WEAPON_UNARMED'), true) -- unarm player
+			SetPedCanPlayGestureAnims(playerPed, false)
+			FreezeEntityPosition(playerPed, true)
+			DisplayRadar(false)
+
+			if Config.EnableHandcuffTimer then
+
+				if HandcuffTimer.Active then
+					ESX.ClearTimeout(HandcuffTimer.Task)
+				end
+
+				StartHandcuffTimer()
+			end
+
+		else
+
+			if Config.EnableHandcuffTimer and HandcuffTimer.Active then
+				ESX.ClearTimeout(HandcuffTimer.Task)
+			end
+
+			ClearPedSecondaryTask(playerPed)
+			SetEnableHandcuffs(playerPed, false)
+			DisablePlayerFiring(playerPed, false)
+			SetPedCanPlayGestureAnims(playerPed, true)
+			FreezeEntityPosition(playerPed, false)
+			DisplayRadar(true)
+		end
+	end)
 end)
 
 RegisterNetEvent('ml_' .. Config.JobName .. 'job:drag')
@@ -422,68 +497,6 @@ AddEventHandler('ml_' .. Config.JobName .. 'job:putOutVehicle', function()
 
     SetEntityCoords(GetPlayerPed(-1), xnew, ynew, plyPos.z)
 end)
-
-function DisableControls(status)
-    if (status) then
-        if IsPedInAnyVehicle(playerPed, false) then
-            DisableControlAction(0, 59, status)
-        end
-
-        DisableControlAction(0, 142, status)
-        DisableControlAction(0, 30,  status)
-        DisableControlAction(0, 31,  status)
-        DisableControlAction(0, 170, status)
-        DisableControlAction(0, 167, status)
-        DisableControlAction(0, 5, status)
-        DisableControlAction(0, 6, status)
-        DisableControlAction(0, 45, status)
-        DisableControlAction(0, 142, status)
-        DisableControlAction(0, 141, status)
-        DisableControlAction(0, 140, status)
-        DisableControlAction(0, 263, status)
-        DisableControlAction(0, 264, status)
-        DisableControlAction(0, 1, status)
-        DisableControlAction(0, 2, status)
-        DisableControlAction(0, 24, status)
-        DisableControlAction(0, 257, status)
-        DisableControlAction(0, 25, status)
-        DisableControlAction(0, 263, status)
-        DisableControlAction(0, Keys['W'], status)
-        DisableControlAction(0, Keys['A'], status)
-        DisableControlAction(0, 31, status)
-        DisableControlAction(0, 30, status)
-        DisableControlAction(0, Keys['R'], status)
-        DisableControlAction(0, Keys['SPACE'], status)
-        DisableControlAction(0, Keys['Q'], status)
-        DisableControlAction(0, Keys['TAB'], status)
-        DisableControlAction(0, Keys['F'], status)
-        DisableControlAction(0, Keys['F1'], status)
-        DisableControlAction(0, Keys['F2'], status)
-        DisableControlAction(0, Keys['F3'], status)
-        DisableControlAction(0, Keys['F6'], status)
-        DisableControlAction(0, Keys['V'], status)
-        DisableControlAction(0, Keys['C'], status)
-        DisableControlAction(0, Keys['X'], status)
-        DisableControlAction(2, Keys['P'], status)
-        DisableControlAction(0, 59, status)
-        DisableControlAction(0, 71, status)
-        DisableControlAction(0, 72, status)
-        DisableControlAction(2, Keys['LEFTCTRL'], status)
-        DisableControlAction(0, 47, status)
-        DisableControlAction(0, 264, status)
-        DisableControlAction(0, 257, status)
-        DisableControlAction(0, 140, status)
-        DisableControlAction(0, 141, status)
-        DisableControlAction(0, 142, status)
-        DisableControlAction(0, 143, status)
-        DisableControlAction(0, 75, status)
-        DisableControlAction(27, 75, status)
-
-        for _, key in pairs(Keys) do
-            DisableControlAction(0, key, status)
-        end
-    end
-end
 
 function CreateJobBlip(playerId)
     local currentPlayer = PlayerPedId(-1)

@@ -2,70 +2,83 @@
 function comma_value(amount)
 	local formatted = amount
 	while true do  
-	  formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-	  if (k==0) then
+		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+		if (k==0) then
 		break
-	  end
+		end
 	end
 	return formatted
-  end
-  
-  ---============================================================
-  -- rounds a number to the nearest decimal places
-  --
-  function round(val, decimal)
+end
+
+---============================================================
+-- rounds a number to the nearest decimal places
+--
+function round(val, decimal)
 	if (decimal) then
-	  return math.floor( (val * 10^decimal) + 0.5) / (10^decimal)
+		return math.floor( (val * 10^decimal) + 0.5) / (10^decimal)
 	else
-	  return math.floor(val+0.5)
+		return math.floor(val+0.5)
 	end
-  end
-  
-  --===================================================================
-  -- given a numeric value formats output with comma to separate thousands
-  -- and rounded to given decimal places
-  --
-  --
-  function format_num(amount, decimal, prefix, neg_prefix)
+end
+
+--===================================================================
+-- given a numeric value formats output with comma to separate thousands
+-- and rounded to given decimal places
+--
+--
+function format_num(amount, decimal, prefix, neg_prefix)
 	local str_amount,  formatted, famount, remain
-  
+
 	decimal = decimal or 2  -- default 2 decimal places
 	neg_prefix = neg_prefix or "-" -- default negative sign
-  
+
 	famount = math.abs(round(amount,decimal))
 	famount = math.floor(famount)
-  
+
 	remain = round(math.abs(amount) - famount, decimal)
-  
-		  -- comma to separate the thousands
+
+			-- comma to separate the thousands
 	formatted = comma_value(famount)
-  
-		  -- attach the decimal portion
+
+			-- attach the decimal portion
 	if (decimal > 0) then
-	  remain = string.sub(tostring(remain),3)
-	  formatted = formatted .. "#" .. remain ..
-				  string.rep("0", decimal - string.len(remain))
+		remain = string.sub(tostring(remain),3)
+		formatted = formatted .. "#" .. remain ..
+					string.rep("0", decimal - string.len(remain))
 	end
-  
-		  -- attach prefix string e.g '$' 
+
+			-- attach prefix string e.g '$' 
 	formatted = (prefix or "") .. formatted 
-  
-		  -- if value is negative then format accordingly
+
+			-- if value is negative then format accordingly
 	if (amount<0) then
-	  if (neg_prefix=="()") then
+		if (neg_prefix=="()") then
 		formatted = "("..formatted ..")"
-	  else
+		else
 		formatted = neg_prefix .. formatted 
-	  end
+		end
 	end
-  
+
 	formatted = string.gsub(formatted, ',', '.')
 
 	return string.gsub(formatted, '#', ',')
-  end
+	end
 
-  function round(num)
+	function round(num)
 	return tonumber(string.format("%.0f", num))
+end
+
+function stringsplit(inputstr, sep)
+	if sep == nil then
+	  sep = "%s"
+	end
+	local t = {}
+	i = 1
+	for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
+	  t[i] = str
+	  i = i + 1
+	end
+	return t
   end
 
 function LogToDiscord(webhooks, name, message, color, footer)
@@ -79,7 +92,7 @@ function SendToDiscord(webhook, name, message, color, footer)
 	local DiscordWebHook = webhook
 	local date_table = os.date("*t")
 	local hour, minute, second = date_table.hour, date_table.min, date_table.sec
-	local year, month, day = date_table.year, date_table.month, date_table.wday
+	local year, month, day = date_table.year, date_table.month, date_table.day
 	local result = string.format("%d-%d-%d %d:%d:%d", day, month, year, hour, minute, second)
 
   	local embeds = {

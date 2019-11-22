@@ -64,9 +64,9 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:storeItem', function(
         TriggerEvent('mlx_addonaccount:getSharedAccount', 'society_' .. Config.JobName .. '_black_money', function(account)
             local blackMoneyAccount = nil
 
-            for _, account in pairs(xPlayer.accounts) do
-                if (account.name == 'black_money') then
-                    blackMoneyAccount = account
+            for _, _account in pairs(xPlayer.accounts) do
+                if (_account.name == 'black_money') then
+                    blackMoneyAccount = _account
                 end
             end
 
@@ -85,7 +85,7 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:storeItem', function(
             LogToDiscord(
                 Config.DiscordLogs.MoneyLog,
                 _U('discord_deposit_black_money', Config.JobLabel), 
-                xPlayer.name .. ' > ' .. format_num(amount, 0, '€ ') .. ' ' .. _U('discord_black_money'),
+                xPlayer.name .. ' > ' .. format_num(count, 0, '€ ') .. ' ' .. _U('discord_black_money'),
                 Config.DiscordLogs.Colors.Green,
                 xPlayer.identifier)
 
@@ -175,16 +175,14 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:getItem', function(so
 
     TriggerEvent('mlx_addoninventory:getSharedInventory', 'society_' .. Config.JobName, function(inventory)
         local item = inventory.getItem(itemName)
-
-        if (item == nil or item.count < count) then
-            cb(false, 'no_item')
-            return
-        end
+        local playerItem = xPlayer.getInventoryItem(item.name)
 
         inventory.removeItem(item.name, count)
         xPlayer.addInventoryItem(item.name, count)
 
-        local playerItem = xPlayer.getInventoryItem(item.name)
+        if (playerItem == nil) then
+            playerItem = xPlayer.getInventoryItem(item.name)
+        end
 
         LogToDiscord(
             Config.DiscordLogs.SafeLog,

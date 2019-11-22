@@ -181,5 +181,15 @@ Locales['nl'] = {
     ['discord_drag'] = '%s heeft een speler meegenomen',
     ['discord_vehicle'] = '%s heeft een speler in een auto gestopt',
     ['discord_out_vehicle'] = '%s heeft een speler uit een auto gehaald',
-    ['seat_head'] = 'Bestuurder'
+    ['seat_head'] = 'Bestuurder',
+    ['to_many_items'] = 'U kunt niet meer als ~g~%s~s~ op zak hebben van item ~g~%s~s~',
+    ['wash_menu'] = 'Geld witwassen',
+    ['wash_money'] = '<strong>Witwas saldo</strong> %s',
+    ['wash_all_black_money'] = '%s witwassen',
+    ['wash_black_money'] = 'Bedrag witwassen',
+    ['wash_money_amount'] = 'U heeft opdracht gegeven om ~g~%s~s~ wit te wassen',
+    ['wash_error'] = 'Uw verzoek voor witwassen is niet mogelijk aangezien u onvoldoende saldo heeft',
+    ['wash'] = 'Wassen',
+    ['wash_amount'] = 'Hoeveel wilt u witwassen?',
+    ['wash_invalid'] = 'U heeft een ongeldige aantal opgegeven'
 }

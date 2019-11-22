@@ -17,10 +17,19 @@ end)
 function OpenBossMenu()
     ESX.UI.Menu.CloseAll()
 
-    local elements = {
-        { label = _U('employee_menu'), value = 'employee_menu' },
-        { label = _U('bank_menu'), value = 'bank_menu' },
-    }
+    local elements = {}
+
+    if (HasAccess(Config.RequiredGradesForEmployee)) then
+        table.insert(elements, { label = _U('employee_menu'), value = 'employee_menu' })
+    end
+
+    if (HasAccess(Config.RequiredGradesForBankSystem)) then
+        table.insert(elements, { label = _U('bank_menu'), value = 'bank_menu' })
+    end
+
+    if (HasAccess(Config.RequiredGradesForMoneyWash)) then
+        table.insert(elements, { label = _U('wash_menu'), value = 'wash_menu' })
+    end
 
     ESX.UI.Menu.Open(
         'ml',
@@ -33,15 +42,41 @@ function OpenBossMenu()
             elements    = elements
         },
         function(data, menu)
-            if (data.current.value == 'employee_menu') then
+            if (data.current.value == 'employee_menu' and
+                HasAccess(Config.RequiredGradesForEmployee)) then
                 OpenEmployeeMenu()
-            elseif (data.current.value == 'bank_menu') then
+            elseif (data.current.value == 'bank_menu' and
+                HasAccess(Config.RequiredGradesForBankSystem)) then
                 OpenBankMenu()
+            elseif (data.current.value == 'wash_menu' and
+                Config.CanWashMoney and
+                HasAccess(Config.RequiredGradesForMoneyWash)) then
+                OpenMoneyWashMenu()
             end
         end,
         function(data, menu)
             menu.close()
         end)
+end
+
+function HasAccess(array, default)
+    local access = default
+
+    if (array == nil) then
+        return access
+    end
+
+    if(#array > 0) then
+        access = false
+
+        for i = 1, #array, 1 do
+            if (array[i] ~= nil and HasGrade(array[i])) then
+                access = true
+            end
+        end
+    end
+
+    return access
 end
 
 function HasGrade(grade)

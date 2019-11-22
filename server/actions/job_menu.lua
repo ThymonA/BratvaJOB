@@ -128,11 +128,6 @@ ESX.RegisterServerCallback('ml_' .. Config.JobName .. 'job:stealItemFromPlayer',
 
     local item = xTarget.getInventoryItem(item_name)
 
-    if (item ~= nil and item.count <= 0) then
-        cb(false, 'no_item', format_num(amount, 0, ''))
-        return
-    end
-
     if (item ~= nil and item.count > 0) then
         xTarget.removeInventoryItem(item.name, item.count)
         xPlayer.addInventoryItem(item.name, item.count)

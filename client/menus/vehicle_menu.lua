@@ -69,10 +69,16 @@ function OpenVehicleMenu()
 
                     TaskWarpPedIntoVehicle(GetPlayerPed(-1), veh, -1)
                     SetVehRadioStation(veh, "OFF")
-                    
+
                     Config.VehicleProps['windowTint'] = Config.VehicleProps.modWindows
 
                     ESX.Game.SetVehicleProperties(veh, Config.VehicleProps)
+
+                    for key, customMods in pairs(Config.CustomVehicleMods) do
+                        if (string.lower(key) == string.lower(model)) then
+                            ESX.Game.SetVehicleProperties(veh, customMods)
+                        end
+                    end
                 end)
             end,
             function(data, menu)
